@@ -1,0 +1,4 @@
+/* Hide "View on GitHub" button */
+.github-button {
+    display: none;
+}
