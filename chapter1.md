@@ -122,7 +122,7 @@ U direktoriju `templates`, kreirajte datoteku pod nazivom `base.html` i dodajte 
 </body>
 </html>
 ```
-**Objašnjenje**: Ovaj predložak definira osnovnu strukturu HTML stranice i koristi blokove ({% block title %} i {% block body %}) koje će nasljedne stranice moći popuniti vlastitim sadržajem.
+**Objašnjenje**: Ovaj predložak definira osnovnu strukturu HTML stranice i koristi blokove (`{% block title %} i {% block body %}`) koje će nasljedne stranice moći popuniti vlastitim sadržajem.
 
 Ažurirajte `index.html`
 Sada ažurirajte index.html da koristi base.html kao osnovni predložak. Izmijenite index.html na sljedeći način:
