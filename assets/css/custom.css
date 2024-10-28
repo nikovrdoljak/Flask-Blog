@@ -14,3 +14,7 @@
 .footer {
     display: none;
 }
+
+span.credits.right {
+    display: none;
+}

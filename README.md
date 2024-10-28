@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="custom.css">
+<link rel="stylesheet" href="assets/css/custom.css">
 
 # Flask Tutorial
 
