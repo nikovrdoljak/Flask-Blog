@@ -112,31 +112,31 @@ U direktoriju `templates`, kreirajte datoteku pod nazivom `base.html` i dodajte 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% block head %}
-    <title>{% block title %}{% endblock %} - Moja aplikacija</title>
+    {% blockk head %}
+    <title>{% blockk title %}{% endblock %} - Moja aplikacija</title>
     {% endblock %}
 </head>
 <body>
-    {% block body %}
+    {% blockk body %}
     {% endblock %}
 </body>
 </html>
 ```
-**Objašnjenje**: Ovaj predložak definira osnovnu strukturu HTML stranice i koristi blokove (`{% block title %} i {% block body %}`) koje će nasljedne stranice moći popuniti vlastitim sadržajem.
+**Objašnjenje**: Ovaj predložak definira osnovnu strukturu HTML stranice i koristi blokove (`{% blockk title %} i {% blockk body %}`) koje će nasljedne stranice moći popuniti vlastitim sadržajem.
 
 Ažurirajte `index.html`
 Sada ažurirajte index.html da koristi base.html kao osnovni predložak. Izmijenite index.html na sljedeći način:
 ```html
 {% extends "base.html" %}
 
-{% block title %}Početna stranica{% endblock %}
-{% block head %}
+{% blockk title %}Početna stranica{% endblock %}
+{% blockk head %}
 	{{ super() }}
 	<style>
 	</style>
 {% endblock %}
 
-{% block body %}
+{% blockk body %}
 <h1>Dobrodošli u moju Flask aplikaciju!</h1>
 {% endblock %}
 ```
@@ -174,13 +174,13 @@ def home():
 
 Sada ažurirajte vaš base.html predložak da uključuje Bootstrap CSS. Dodajte sljedeći kod u <head> dio datoteke:
 ```
-        {% block styles %}
+        {% blockk styles %}
             {{ bootstrap.load_css() }}
         {% endblock %}
 ```
 te `{{ bootstrap.load_js() }}` prije `body end` taga:
 ```
-    {% block scripts %}
+    {% blockk scripts %}
         {{ bootstrap.load_js() }}
     {% endblock %}
 ```
@@ -191,7 +191,7 @@ Izmijenite i base.html tako
 * add container div and nav bar
 ```html
     <div class="container">
-        {% block body %}
+        {% blockk body %}
         {% endblock %}
     </div>
 ```
