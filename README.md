@@ -4,8 +4,8 @@
 
 Dobrodošli u Flask Blog vodič
 
-1. [Uvod](chapter1.md)
-2. [](chapter2.md)
-3. [](chapter3.md)
+1. [Flask, predlošci i web forme](chapter1.md)
+2. [Rad s bazom podataka](chapter2.md)
+3. [Autentikacija](chapter3.md)
 
 Krenimo!
