@@ -131,8 +131,8 @@ U direktoriju `templates`, kreirajte datoteku pod nazivom `base.html` i dodajte 
 Ažurirajte `index.html`
 Sada ažurirajte index.html da koristi base.html kao osnovni predložak. Izmijenite index.html na sljedeći način:
 ```html
-{% extends "base.html" %}
 {% raw %}
+{% extends "base.html" %}
 {% block title %}Početna stranica{% endblock %}
 {% block head %}
 	{{ super() }}
@@ -145,7 +145,7 @@ Sada ažurirajte index.html da koristi base.html kao osnovni predložak. Izmijen
 {% endblock %}
 {% endraw %}
 ```
-**Objašnjenje**: Ovdje koristimo `{% extends "base.html" %}` da naznačimo da `index.html` nasljeđuje strukturu iz `base.html`. Blokovi `title` i `body` se koriste za postavljanje specifičnog sadržaja za ovu stranicu.
+**Objašnjenje**: Ovdje koristimo `{% raw %}{% extends "base.html" %}{% endraw %}` da naznačimo da `index.html` nasljeđuje strukturu iz `base.html`. Blokovi `title` i `body` se koriste za postavljanje specifičnog sadržaja za ovu stranicu.
 
 Ponovo pokrenite aplikaciju koristeći `flask run`.
 Kada posjetite http://127.0.0.1:5000/, trebali biste vidjeti sadržaj iz `index.html`, koji koristi osnovni predložak `base.html`. Ovim koracima ste uspješno implementirali osnovni predložak u svoju Flask aplikaciju, omogućavajući bolju organizaciju i ponovno korištenje koda.
@@ -185,7 +185,7 @@ Sada ažurirajte vaš base.html predložak da uključuje Bootstrap CSS. Dodajte 
         {% endblock %}
         {% endraw %}
 ```
-te `{{ bootstrap.load_js() }}` prije `body end` taga:
+te `{% raw %}{{ bootstrap.load_js() }}{% endraw %}` prije `body end` taga:
 ```
     {% raw %}
     {% block scripts %}
