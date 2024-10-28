@@ -1,8 +1,16 @@
-/* Hide "View on GitHub" button */
 .github-button {
     display: none;
 }
 
 #header {
+    display: none;
+}
+
+.header {
+    display: none;
+}
+
+
+.footer {
     display: none;
 }

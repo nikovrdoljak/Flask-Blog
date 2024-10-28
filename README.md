@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="custom.css">
+
 # Flask Tutorial
 
 Dobrodošli u Flask Blog vodič
