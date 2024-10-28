@@ -210,6 +210,6 @@ Izmijenite i base.html tako
 
 Sada bi vaša aplikacija trebala koristiti Bootstrap stilove i komponente, čineći je vizualno privlačnijom. Ovim koracima ste uspješno dodali `bootstrap-flask` biblioteku u vašu Flask aplikaciju.
 
-Posjetite https://bootstrap-flask-example.azurewebsites.net/ da vidite demo prikaz jedne Flask Bootstrap aplikacije koristeći sve komponente ove biblioteke.
+Posjetite [https://bootstrap-flask-example.azurewebsites.net/](https://bootstrap-flask-example.azurewebsites.net/) da vidite demo prikaz jedne Flask Bootstrap aplikacije koristeći sve komponente ove biblioteke.
 
 
