@@ -112,35 +112,35 @@ U direktoriju `templates`, kreirajte datoteku pod nazivom `base.html` i dodajte 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% blockk head %}
-    <title>{% blockk title %}{% endblock %} - Moja aplikacija</title>
-    {% endblock %}
+    \{% block head %}
+    <title>\{% block title %}\{% endblock %} - Moja aplikacija</title>
+    \{% endblock %}
 </head>
 <body>
-    {% blockk body %}
-    {% endblock %}
+    \{% block body %}
+    \{% endblock %}
 </body>
 </html>
 ```
-**Objašnjenje**: Ovaj predložak definira osnovnu strukturu HTML stranice i koristi blokove (`{% blockk title %} i {% blockk body %}`) koje će nasljedne stranice moći popuniti vlastitim sadržajem.
+**Objašnjenje**: Ovaj predložak definira osnovnu strukturu HTML stranice i koristi blokove (`\{% block title %} i \{% block body %}`) koje će nasljedne stranice moći popuniti vlastitim sadržajem.
 
 Ažurirajte `index.html`
 Sada ažurirajte index.html da koristi base.html kao osnovni predložak. Izmijenite index.html na sljedeći način:
 ```html
-{% extends "base.html" %}
+\{% extends "base.html" %}
 
-{% blockk title %}Početna stranica{% endblock %}
-{% blockk head %}
-	{{ super() }}
+\{% block title %}Početna stranica\{% endblock %}
+\{% block head %}
+	\{{ super() }}
 	<style>
 	</style>
-{% endblock %}
+\{% endblock %}
 
-{% blockk body %}
+\{% block body %}
 <h1>Dobrodošli u moju Flask aplikaciju!</h1>
-{% endblock %}
+\{% endblock %}
 ```
-**Objašnjenje**: Ovdje koristimo `{% extends "base.html" %}` da naznačimo da `index.html` nasljeđuje strukturu iz `base.html`. Blokovi `title` i `body` se koriste za postavljanje specifičnog sadržaja za ovu stranicu.
+**Objašnjenje**: Ovdje koristimo `\{% extends "base.html" %}` da naznačimo da `index.html` nasljeđuje strukturu iz `base.html`. Blokovi `title` i `body` se koriste za postavljanje specifičnog sadržaja za ovu stranicu.
 
 Ponovo pokrenite aplikaciju koristeći `flask run`.
 Kada posjetite http://127.0.0.1:5000/, trebali biste vidjeti sadržaj iz `index.html`, koji koristi osnovni predložak `base.html`. Ovim koracima ste uspješno implementirali osnovni predložak u svoju Flask aplikaciju, omogućavajući bolju organizaciju i ponovno korištenje koda.
@@ -174,15 +174,15 @@ def home():
 
 Sada ažurirajte vaš base.html predložak da uključuje Bootstrap CSS. Dodajte sljedeći kod u <head> dio datoteke:
 ```
-        {% blockk styles %}
-            {{ bootstrap.load_css() }}
-        {% endblock %}
+        \{% block styles %}
+            \{{ bootstrap.load_css() }}
+        \{% endblock %}
 ```
-te `{{ bootstrap.load_js() }}` prije `body end` taga:
+te `\{{ bootstrap.load_js() }}` prije `body end` taga:
 ```
-    {% blockk scripts %}
-        {{ bootstrap.load_js() }}
-    {% endblock %}
+    \{% block scripts %}
+        \{{ bootstrap.load_js() }}
+    \{% endblock %}
 ```
 **Objašnjenje**: Ovaj kod uključuje Bootstrap CSS iz CDN-a, omogućavajući vam da koristite Bootstrap stilove u vašem projektu.
 
@@ -191,8 +191,8 @@ Izmijenite i base.html tako
 * add container div and nav bar
 ```html
     <div class="container">
-        {% blockk body %}
-        {% endblock %}
+        \{% block body %}
+        \{% endblock %}
     </div>
 ```
 **Objašnjenje**: Ovdje smo dodali Bootstrap klase za stilizaciju zaglavlja i glavnog dijela aplikacije, koristeći `container` Bootstrap CSS klasu za pravilno oblikovanje glavnog sadržaja.
