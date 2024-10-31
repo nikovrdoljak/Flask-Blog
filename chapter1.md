@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="assets/css/custom.css">
 
-# Poglavlje 1: Uvod u Flask i rad s web formama
+# Poglavlje 1: Flask i web obrasci
 
 ## Hello world aplikacija
 Prvo ćemo pokrenuti novi Git repozitorij kako bismo mogli pratiti promjene u našem projektu. Pokrenite sljedeću naredbu u PowerShellu: 
@@ -564,3 +564,4 @@ Ove kategorije omogućavaju korisniku lako razlikovanje vrsta obavijesti zahvalj
 | `warning`  | `alert-warning`   | Žuto   |
 | `info`     | `alert-info`      | Plavo  |
 
+[Naslovna stranica](README.md) | [Slijedeće poglavlje: Rad s bazom podataka](chapter2.md)
