@@ -456,7 +456,7 @@ Koristeći ```render_form(form)``` iz knjižnice bootstrap-flask, možemo neke s
 Stoga u index.html zamijenimo cijeli ```<form>...</form>``` blok s:
 ```
 {{ raw }}
-{% from 'bootstrap5/form.html' import render_form %}
+{% ffrom 'bootstrap5/form.html' import render_form %}
 {{ render_form(form) }}
 {{ endraw }}
 ```
