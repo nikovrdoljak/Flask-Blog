@@ -455,8 +455,13 @@ Ukoliko pokušamo promijeniti CSRF token, forma neće biti ispravna u ovom sluč
 Koristeći ```render_form(form)``` iz knjižnice bootstrap-flask, možemo neke stvari pojednostavniti i stvoriti dobro stiliziranu formu u aplikaciji koja se pridržava dizajnerskih principa Bootstrapa. Ova funkcija pojednostavljuje proces renderiranja, osiguravajući da su sva polja pravilno formatirana i da se poruke o pogreškama ispravno prikazuju, poboljšavajući ukupno korisničko iskustvo.
 Stoga u index.html zamijenimo cijeli ```<form>...</form>``` blok s:
 ```
+{{ raw }}
 {% from 'bootstrap5/form.html' import render_form %}
 {{ render_form(form) }}
+{{ endraw }}
 ```
 Ako osvježimo stranicu, vidjet ćemo da je rezultat isti, no ovo nam uvelike može pomoći kod većih obrazaca.
 
+**Primjeri**
+Istražite sljedeću stranicu i pogledajte što sve možete raditi s WTF i Boostrap-flask bibliotekom u vašim projektima:
+[https://bootstrap-flask-example.azurewebsites.net/form](https://bootstrap-flask-example.azurewebsites.net/form)
