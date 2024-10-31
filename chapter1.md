@@ -541,7 +541,9 @@ U baznom predlošku (base.html) koristit ćemo render_messages() metodu iz boots
 ```
 **Objašnjenje**
 * ```render_messages()```: Prikazuje sve flash poruke uz odgovarajuće Bootstrap stilove temeljem category parametra.
-* Kada korisnik pošalje obrazac i ime je uspješno ažurirano, prikazuje se zelena obavijest o uspjehu.
+* Kada korisnik pošalje obrazac i ime je uspješno ažurirano, prikazuje se zelena obavijest o uspjehu:
+
+![Flash poruka](/assets/images/flash-msg.png)
 
 Dakle, Flash poruka može imati dodatni argument *category* koji određuje vrstu poruke (npr. uspjeh, pogreška). Flask podržava razne kategorije, a bootstrap-flask ih prikazuje u boji prema Bootstrap stilu.
 U ovom primjeru, flash metoda koristi poruku s tekstom "Promijenili ste ime!" i kategoriju "success".
