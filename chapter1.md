@@ -554,6 +554,7 @@ Evo popisa najčešće korištenih kategorija s odgovarajućim stilovima u Boots
 * info: Prikazuje poruku u plavoj boji (alert-info). Koristi se za opće informativne poruke.
 
 Ove kategorije omogućavaju korisniku lako razlikovanje vrsta obavijesti zahvaljujući različitim bojama:
+
 | Kategorija | Bootstrap klasa  | Boja   |
 |------------|-------------------|--------|
 | `success`  | `alert-success`   | Zeleno |
