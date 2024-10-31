@@ -257,6 +257,20 @@ Primjer jednostavnog obrasca:
 </form>
 ```
 U app.py ćemo dohvatiti vrijednost name iz upitnog niza pomoću request.args.get.
+
+```python
+from flask import Flask, render_template, request
+from flask_bootstrap import Bootstrap5
+
+app = Flask(__name__)
+bootstrap = Bootstrap5(app)
+
+@app.route("/")
+def home():
+    name = request.args.get("name", "")  # Preuzimamo "name" iz upitnog niza, ili prazan string ako nije postavljeno
+    return render_template("index.html", name = name) 
+```
+
 Dodatno, iznad forme dodajmo sljedeći kod:
 ```
 {% raw %}
@@ -294,4 +308,155 @@ Objašnjenje Bootstrap klasa
 * ```btn i btn-primary```: btn je osnovna klasa za sve gumbe u Bootstrapu, dok btn-primary dodaje stil primarnog gumba, koji obično dolazi s plavom pozadinom i bijelim tekstom (boje se mogu prilagoditi). Ovaj stil naglašava gumb za slanje, čineći ga prepoznatljivim i lako vidljivim korisnicima.
 
 Kombinacija ovih klasa osigurava responzivnost, preglednost i funkcionalnost obrasca na svim uređajima. S ovim osnovnim Bootstrap klasama, možemo postaviti profesionalno stilizirane oblike koji će automatski prilagoditi svoj izgled veličini ekrana, pružajući bolje korisničko iskustvo.
+
+#### Prilagodba rute za GET i POST metode
+Dodajmo logiku koja omogućuje našoj index() ruti prihvaćanje obje metode, GET i POST. Ovisno o metodi zahtjeva, podaci će se dohvaćati iz request.args za GET ili request.form za POST.
+
+Primijenimo ```method="post"``` u form elementu kako bismo poslali podatke putem POST metode: ```<form method="post">```
+
+Prilagodba app.py da prihvati GET i POST metode
+U app.py, prilagodit ćemo rutu kako bi prihvatila i GET i POST metode te obrađivala podatke na temelju metode koja je korištena.
+```python
+@app.route("/")
+def home():
+    name = ""
+    if request.method == "POST":
+        # Ako je POST, podatke dobijemo iz request.form
+        name = request.form.get("name", "")
+    else:
+        # Ako je GET, podatke dobijemo iz request.args
+        name = request.args.get("name", "")    
+    return render_template("index.html", name = name) 
+```
+
+**Objašnjenje koda**
+* ```methods=["GET", "POST"]```: Dodavanjem ovog argumenta ruti omogućujemo da index() funkcija odgovara na oba zahtjeva, GET i POST.
+* Provjera metode zahtjeva: Koristimo request.method za provjeru metode zahtjeva:
+    * Ako je metoda POST, dohvaćamo vrijednost name iz request.form, što znači da dolazi iz tijela zahtjeva.
+    * Ako je metoda GET, dohvaćamo name iz request.args, što znači da dolazi iz upitnog niza.
+
+#### Problem: "Confirm Form Resubmission"
+Kada korisnik pošalje obrazac s POST metodom i osvježi stranicu, može se pojaviti upozorenje "Confirm Form Resubmission" (Potvrdi ponovno slanje obrasca). Ovo se događa jer preglednik prepoznaje POST zahtjev i traži potvrdu za ponovno slanje kako bi spriječio slučajno dupliciranje podataka.
+*Napomena*: Ovaj ćemo problem riješiti kasnije koristeći tehniku "Post/Redirect/Get" (PRG) koja sprječava ponovno slanje podataka prilikom osvježavanja stranice. Trenutno ćemo ostaviti rutu ovakvom, kako prikazali problem, a zatim ćemo ga kasnije otkloniti.
+
+## WTForms
+**WTForms** je Python biblioteka koja omogućava lako kreiranje i obradu web obrazaca u aplikacijama. U Flask okruženju često se koristi proširenje Flask-WTF, koje integrira WTForms sa Flask aplikacijama i dodaje korisne značajke kao što su validacija unosa, CSRF zaštita i jednostavnija obrada podataka. Flask-WTF olakšava rad s obrascima jer omogućava razvijateljima da definiraju i validiraju obrasce unutar Python koda, bez potrebe za pisanjem HTML i JavaScript koda za svaki obrazac. Na taj način se smanjuje složenost i poboljšava sigurnost aplikacije.
+
+Jedan od glavnih razloga za korištenje WTForms je validacija podataka. Validacija osigurava da korisnik unosi točne i sigurne podatke u aplikaciju, a WTForms omogućava različite ugrađene validatore, kao što su provjera duljine unosa, formatiranja e-maila ili raspona brojeva. Također, omogućava korištenje prilagođenih validatora za specifične zahtjeve aplikacije. WTForms automatski prikazuje greške korisnicima ako podaci nisu ispravni, čime olakšava i poboljšava korisničko iskustvo.
+
+
+#### Što je Flask-WTF i kako ga instalirati
+Flask-WTF je proširenje za Flask koje olakšava rad s web obrascima. Omogućava nam korištenje različitih validacija, generira CSRF (Cross-Site Request Forgery) token za sigurnost i olakšava obradu podataka unutar ruta.
+
+Za instalaciju Flask-WTF koristimo pip naredbu:
+```
+pip install flask-wtf
+```
+
+#### Kreiranje NameForm klase s validatorima
+Sada ćemo kreirati klasu forme NameForm koja će imati jedno polje, name, koje traži unos korisnika. Koristit ćemo DataRequired validator da osiguramo da je polje obavezno.
+```python
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
+
+class NameForm(FlaskForm):
+    name = StringField("Ime", validators=[DataRequired()])
+    submit = SubmitField("Pošalji")
+```
+**Objašnjenje koda**
+* **NameForm**: Ovo je klasa forme koja nasljeđuje FlaskForm iz Flask-WTF. Ova klasa koristi WTForms za definiranje i validaciju podataka.
+* **name**: Definirali smo polje name kao StringField, koje očekuje tekstualni unos.
+* **validators=[DataRequired()]**: Koristimo validator DataRequired, koji osigurava da polje nije prazno. Ako korisnik ne unese podatak, prikazuje se greška.
+* **submit**: Ovo je gumb za slanje forme, definiran kao SubmitField.
+
+
+U WTForms-u možemo koristiti razna polja obrazaca za rukovanje korisničkim unosom. Evo popisa često korištenih polja:
+
+1. **StringField** - **String polje**
+2. **TextAreaField** - **Tekstualno područje**
+3. **BooleanField** - **Boolovsko polje**
+4. **PasswordField** - **Polje lozinke**
+5. **HiddenField** - **Skriveno polje**
+6. **IntegerField** - **Cjelobrojno polje**
+7. **FloatField** - **Float polje**
+8. **DecimalField** - **Decimalno polje**
+9. **SelectField** - **Polje izbora**
+10. **SelectMultipleField** - **Polje višestrukog izbora**
+11. **FileField** - **Polje za datoteke**
+12. **SubmitField** - **Polje za slanje**
+13. **DateField** - **Polje za datum**
+14. **DateTimeField** - **Polje za datum i vrijeme**
+15. **TimeField** - **Polje za vrijeme**
+16. **EmailField** - **Polje za e-poštu**
+17. **URLField** - **Polje za URL**
+18. **SearchField** - **Polje za pretraživanje**
+19. **ColorField** - **Polje za boje**
+
+**Objašnjenje validatora**
+Validatori u WTForms provjeravaju vrijednosti koje korisnici unesu u polja. Ako unos ne odgovara pravilima, prikazuje se poruka o grešci.
+
+Lista i objašnjenje validatora u WTForms:
+* DataRequired: Provjerava je li polje ispunjeno. Obavezno polje.
+* Email: Provjerava je li uneseni podatak ispravna email adresa.
+* Length: Osigurava da je duljina unosa između minimalne i maksimalne vrijednosti.
+* NumberRange: Provjerava je li broj unutar određenog raspona.
+* Optional: Omogućava da polje ostane prazno i preskače validaciju ako je prazno.
+* Regexp: Provjerava unos prema regularnom izrazu.
+* URL: Provjerava je li unos valjani URL.
+* AnyOf i NoneOf: Provjeravaju sadrži li polje određene vrijednosti ili izbjegava li određene vrijednosti.
+
+**Prilagodba obrasca u index.html i koda u ruti**
+U index.html sada ćemo koristiti Flask-WTF za prikaz forme s prilagođenim poljem name i gumbom submit.
+```html
+    <form method="post">
+        <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+```
+U ruti index() sada ćemo koristiti NameForm:
+```python
+@app.route("/", methods=["GET", "POST"])
+def index():
+    form = NameForm()
+    name = form.name.data if request.method == "POST" else "Stranger"
+    
+    return render_template("index.html", pozdrav=pozdrav, form=form)
+```
+Ako sad pokrenemo aplikaciju dobit ćemo grešku *"RuntimeError: A secret key is required to use CSRF."* Razlog za to jest da Flask-WTF automatski uključuje CSRF zaštitu.
+Kako bismo omogućili CSRF zaštitu, Flask aplikacija treba imati SECRET_KEY. Dodajmo ga u kod:
+```python
+app = Flask(__name__)
+app.secret_key = 'tajni_ključ'  # Ovo postavljamo kao tajni ključ za sigurnost
+```
+U index.html, dodajmo i ```form.hidden_tag()```. 
+```html
+<form method="post">
+    {{ form.hidden_tag() }}
+
+```
+Ova metoda automatski dodaje skriveni **CSRF token** u formu. CSRF token je važan jer štiti našu aplikaciju od napada poznatih kao Cross-Site Request Forgery. Ovaj napad koristi se kako bi neovlašteno izvršio zahtjev kao da dolazi od 
+ovlaštenog korisnika. Token omogućava aplikaciji da razlikuje legitimne zahtjeve od onih koji bi mogli biti zlonamjerni.
+Ako pokrenete aplikaciju i pogledate izvorni HTML kod, primjetit ćete token:
+```html
+<input id="csrf_token" name="csrf_token" type="hidden" value="Ijc0ZWVkOTg3YjkwOWVmMjIzZjA5N2UzYmViYTVjM2QxYTU5MDhkYTMi.ZyN4dQ.OeumUug9Knq2TfqCbSDsDbEeUJ4">
+```
+Ako pokušate poslati obrazac bez da ste upisali ime, na klijentskoj strani ćete dobiti poruku *Please fill in this field.* što znači da sad naša validacija obrasca funkcionira.
+No bez obzira na ovo, još uvijek nismo uključili validaciju na poslužiteljskom kodu. Stoga dodajmo još jednu promijenu:
+```python
+    name = form.name.data if form.validate_on_submit() else "" 
+```
+Ukoliko pokušamo promijeniti CSRF token, forma neće biti ispravna u ovom slučaju.
+
+**bootstrap-flask i render_form()**
+Koristeći ```render_form(form)``` iz knjižnice bootstrap-flask, možemo neke stvari pojednostavniti i stvoriti dobro stiliziranu formu u aplikaciji koja se pridržava dizajnerskih principa Bootstrapa. Ova funkcija pojednostavljuje proces renderiranja, osiguravajući da su sva polja pravilno formatirana i da se poruke o pogreškama ispravno prikazuju, poboljšavajući ukupno korisničko iskustvo.
+Stoga u index.html zamijenimo cijeli ```<form>...</form>``` blok s:
+```
+{% from 'bootstrap5/form.html' import render_form %}
+{{ render_form(form) }}
+```
+Ako osvježimo stranicu, vidjet ćemo da je rezultat isti, no ovo nam uvelike može pomoći kod većih obrazaca.
 
