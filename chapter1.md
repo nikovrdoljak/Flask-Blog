@@ -465,3 +465,99 @@ Ako osvježimo stranicu, vidjet ćemo da je rezultat isti, no ovo nam uvelike mo
 **Primjeri**
 Istražite sljedeću stranicu i pogledajte što sve možete raditi s WTF i Boostrap-flask bibliotekom u vašim projektima:
 [https://bootstrap-flask-example.azurewebsites.net/form](https://bootstrap-flask-example.azurewebsites.net/form)
+
+## Post/Redirect/Get (PRG) obrazac
+**Post/Redirect/Get (PRG)** obrazac (*pattern*) je web razvojna praksa koja se koristi za rješavanje problema s ponovnim slanjem obrazaca i poboljšanje korisničkog iskustva u web aplikacijama. Kada korisnik pošalje obrazac putem POST metode, može doći do problema poznatog kao "potvrda ponovnog slanja obrasca". Ovaj problem se događa kada korisnik ponovno učita stranicu nakon slanja obrasca, što može rezultirati ponovljenim slanjem istih podataka (npr. plaćanja ili kreiranja novih stavki).
+
+PRG obrazac rješava ovaj problem tako da, nakon što se obrazac pošalje, aplikacija preusmjeri korisnika na drugu stranicu putem GET metode, umjesto da ponovno učitava stranicu s obrascem. To omogućuje da se podaci obrađuju jednom, a zatim korisnik bude preusmjeren na stranicu koja može prikazati rezultate ili poruku o uspjehu.
+
+#### Implementacija PRG obrasca u Flask aplikaciji
+Evo kako možemo implementirati PRG obrazac u našoj aplikaciji koristeći Flask-WTF.
+
+Evo kako izgleda ažurirana ruta u Flask aplikaciji:
+```python
+from flask import Flask, render_template, request, redirect, url_for, session # importajmo dvije nove metode i podršku za rad sa sesijama
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    form = NameForm()
+    if form.validate_on_submit():  # Provjerava li je obrazac uspješno poslan i validiran
+        session['name'] = form.name.data # pohranjuje ime u sesiju
+        return redirect(url_for('index'))  # Preusmjeravamo na istu rutu 'index'
+    return render_template('index.html', name = session.get('name'), form = form)
+```
+**Objašnjenje koda**
+* ```session['name'] = form.name.data```: Kada korisnik uspješno pošalje obrazac, ime se pohranjuje u sesiju. session je posebna Flask struktura koja omogućava pohranu podataka tijekom trajanja korisničke sesije.
+* ```redirect()``: Preusmjeravanje na istu stranicu: Korisnik se preusmjerava natrag na istu rutu index kako bi se izbjeglo ponovno slanje obrasca.
+* ```url_for()``` za generiranje URL-a na temelju imena rute.
+* ```session.get('name')```: Šaljemo kao name vrijednost iz sesije. Ako je nema, šalje se prazan string.
+
+**Prednosti korištenja sesija**
+* Trajnost podataka: Podaci pohranjeni u sesiji ostaju dostupni tijekom trajanja sesije korisnika, što omogućuje da se korisnik prepoznaje tijekom više zahtjeva.
+* Jednostavnost: Korištenje sesija omogućava lakše upravljanje podacima koji se često koriste, bez potrebe za ponovnim slanjem podataka putem URL-a ili putem flash poruka.
+* Sigurnost: Flask automatski osigurava podatke pohranjene u sesijama, čime se smanjuje rizik od potencijalnih sigurnosnih prijetnji.
+
+**U network kartici alata preglednika možemo vidjeti kako ovo funkcionira.**
+* POST zahtjev:
+    * Otvorite alat za razvojne programere (F12 u većini preglednika) i idite na karticu Network.
+    * Kada pošaljete obrazac, vidjet ćete POST zahtjev u mrežnim zahtjevima. Ovaj zahtjev prikazuje HTTP metodu POST i povratni status 302 u odgovoru.
+    * Ako kliknete na POST zahtjev, moći ćete vidjeti podatke koji su poslani u zaglavljima (Headers) pod opcijom Form Data – ovo uključuje podatke unesene u obrazac.
+* GET zahtjev:
+    * Neposredno nakon POST zahtjeva, pojavit će se GET zahtjev.
+    * GET zahtjev prikazuje HTTP metodu GET i povratni status 200 u odgovoru.
+    * Ovaj GET zahtjev zapravo prikazuje preusmjereni prikaz stranice (npr., prikaz pozdravne poruke na temelju imena spremljenog u sesiji).
+
+
+## flash poruke
+Flask ima ugrađenu metodu flash() koja nam omogućava slanje kratkih obavijesti korisniku. Ove obavijesti su idealne za prikazivanje povratnih informacija, poput poruka o uspješnom ažuriranju imena. bootstrap-flask ima metodu render_messages() koja omogućava automatsko prikazivanje flash poruka sa stilovima Bootstrap-a.
+
+Pomijenimo kod u ruti:
+```python
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    form = NameForm()
+    if form.validate_on_submit():
+        old_name = session.get('name')
+        if old_name is not None and old_name != form.name.data:
+            flash('Promijenili ste ime!', 'success')
+
+        session['name'] = form.name.data
+        return redirect(url_for('index'))
+    return render_template('index.html', name = session.get('name'), form = form)
+```
+U baznom predlošku (base.html) koristit ćemo render_messages() metodu iz bootstrap-flask za prikaz flash poruka u HTML-u:
+```
+    <div class="container mt-5">
+    {% raw %}
+    {% from 'bootstrap5/utils.html' import render_messages %}
+    {{ render_messages(container=False, dismissible=True) }}
+        
+    {% block body %}
+    {% endblock %}
+    {% endraw %}
+    </div>
+```
+**Objašnjenje**
+* ```render_messages()```: Prikazuje sve flash poruke uz odgovarajuće Bootstrap stilove temeljem category parametra.
+* Kada korisnik pošalje obrazac i ime je uspješno ažurirano, prikazuje se zelena obavijest o uspjehu.
+
+Dakle, Flash poruka može imati dodatni argument *category* koji određuje vrstu poruke (npr. uspjeh, pogreška). Flask podržava razne kategorije, a bootstrap-flask ih prikazuje u boji prema Bootstrap stilu.
+U ovom primjeru, flash metoda koristi poruku s tekstom "Promijenili ste ime!" i kategoriju "success".
+
+** Kategorije Flash Poruka i Bootstrap stilovi** 
+Evo popisa najčešće korištenih kategorija s odgovarajućim stilovima u Bootstrapu:
+* success: Prikazuje poruku u zelenoj boji (alert-success). Koristi se za poruke koje označavaju uspješno izvršene radnje.
+* error ili danger: Prikazuje poruku u crvenoj boji (alert-danger). Koristi se za poruke o pogreškama ili neuspješnim radnjama.
+* warning: Prikazuje poruku u žutoj boji (alert-warning). Koristi se za poruke upozorenja.
+* info: Prikazuje poruku u plavoj boji (alert-info). Koristi se za opće informativne poruke.
+
+Ove kategorije omogućavaju korisniku lako razlikovanje vrsta obavijesti zahvaljujući različitim bojama:
+| Kategorija | Bootstrap klasa  | Boja   |
+|------------|-------------------|--------|
+| `success`  | `alert-success`   | Zeleno |
+| `danger`   | `alert-danger`    | Crveno |
+| `warning`  | `alert-warning`   | Žuto   |
+| `info`     | `alert-info`      | Plavo  |
+
