@@ -196,20 +196,102 @@ te `{% raw %}{{ bootstrap.load_js() }}{% endraw %}` prije `body end` taga:
 **Objašnjenje**: Ovaj kod uključuje Bootstrap CSS iz CDN-a, omogućavajući vam da koristite Bootstrap stilove u vašem projektu.
 
 
-Izmijenite i base.html tako 
-* add container div and nav bar
+Izmijenite i `base.html` tako da "uključimo" `<div class="container">` kao osnovni Bootstrap element u koji ćemo dodavati buduće HTML stranice ovog projekta.
 ```html
-    <div class="container">
+    <div class="container mt-5">
         {% raw %}
         {% block body %}
         {% endblock %}
         {% endraw %}
     </div>
 ```
-**Objašnjenje**: Ovdje smo dodali Bootstrap klase za stilizaciju zaglavlja i glavnog dijela aplikacije, koristeći `container` Bootstrap CSS klasu za pravilno oblikovanje glavnog sadržaja.
+**Objašnjenje**: Ovdje smo dodali Bootstrap klasu  `container` za stilizaciju glavnog dijela aplikacije.
 
 Sada bi vaša aplikacija trebala koristiti Bootstrap stilove i komponente, čineći je vizualno privlačnijom. Ovim koracima ste uspješno dodali `bootstrap-flask` biblioteku u vašu Flask aplikaciju.
 
 Posjetite [https://bootstrap-flask-example.azurewebsites.net/](https://bootstrap-flask-example.azurewebsites.net/) da vidite demo prikaz jedne Flask Bootstrap aplikacije koristeći sve komponente ove biblioteke.
 
+## Rad s HTML web obrascima
+Web obrasci (ili forme) su ključni elementi web stranica koji omogućuju korisnicima interakciju s aplikacijom ili web stranicom. Obrasci omogućuju unos i slanje podataka serveru, što je temelj za funkcionalnosti poput prijava, registracija, pretraživanja i mnogo više.
+
+### Struktura Web Obrasca
+Obrazac se definira pomoću HTML elementa <form>, unutar kojeg se nalaze različiti elementi za unos podataka. Najčešći elementi u obrascima su:
+
+```<input>```: Koristi se za različite vrste unosa, poput teksta, lozinki, brojeva i još mnogo toga. Atributom type definiramo vrstu unosa, npr. type="text" za unos teksta.
+```<button>```: Gumb za slanje ili poništavanje podataka. Uobičajeni type atributi za gumb su submit (za slanje podataka) i reset (za poništavanje unosa).
+
+Primjer jednostavnog obrasca:
+```html
+<form action="/submit" method="post">
+    <label for="name">Ime:</label>
+    <input type="text" id="name" name="name">
+    <button type="submit">Pošalji</button>
+</form>
+```
+
+### Atributi Obrasca
+* action: Definira URL na koji će se podaci slati. Na primjer, action="/submit" šalje podatke na /submit rutu.
+* method: Određuje način slanja podataka. Najčešće korištene metode su:
+    * GET: Podaci se šalju putem URL-a kao dio upitnog niza (query string). Koristi se za jednostavne zahtjeve poput pretraživanja.
+    * POST: Podaci se šalju u tijelu zahtjeva i ne prikazuju se u URL-u. Koristi se za osjetljive ili veće podatke, poput prijava i registracija.
+#### Upitni Niz (Query String)
+Kod GET metoda, podaci se dodaju u URL kao upitni niz. Primjerice, ako obrazac pošalje podatke s unosom name=Ana, URL bi mogao izgledati ovako:
+http://localhost:5000/?name=Ana
+
+Ova vrsta prijenosa korisna je jer omogućava lako dohvaćanje parametara s URL-a te ponavljanje i dijeljenje URL-a s podacima.
+
+Osnovne Prakse Kodiranja
+* **Provjera podataka**: Iako se podaci mogu provjeriti na strani klijenta (JavaScript), ključna provjera mora biti provedena na strani servera.
+* **Prijateljski izgled**: Koristite HTML label element za označavanje unosa, čineći obrazac pristupačnijim i preglednijim.
+* **Sigurnost**: Kod korištenja POST metode, podatke je bolje slati putem HTTPS protokola za zaštitu osjetljivih informacija.
+Web obrasci čine aplikaciju dinamičnom i interaktivnom, pružajući jednostavan način za komunikaciju između korisnika i aplikacije. U sljedećim poglavljima istražit ćemo kako rukovati podacima iz obrazaca u Flask aplikaciji, spremiti ih u bazu podataka i dodatno proširiti funkcionalnost.
+
+#### Implementacija jednostavnog web obrasca:
+Dodajmo obrazac u index.html:
+Primjer jednostavnog obrasca:
+```html
+<form>
+    <label for="name">Ime:</label>
+    <input type="text" id="name" name="name">
+    <button type="submit">Pošalji</button>
+</form>
+```
+U app.py ćemo dohvatiti vrijednost name iz upitnog niza pomoću request.args.get.
+Dodatno, iznad forme dodajmo sljedeći kod:
+```
+{% raw %}
+{% if name %}
+	<h1>Hello, {{ name }}!</h1>
+{% else %}
+	<h1>Hello, Stranger!</h1>
+{% endif %}
+{% endblock %}
+{% endraw %}
+```
+**Objašnjenje**
+* Obrazac: U index.html koristimo form element s method="get" (što je zadano) kako bi se podaci poslali putem upitnog niza.
+* Dohvat podataka: U app.py, funkcija index() koristi request.args.get("name") za dohvat unesenog naziva iz upitnog niza.
+* Uvjetni prikaz u predlošku: Ako name nije unesen, prikazat će se tekst "Hello, Stranger", a ako jest, prikazat će se pozdrav s imenom.
+**Rezultat**
+Prilikom otvaranja stranice bez unesenog naziva prikazat će se "Hello, Stranger". Nakon unosa imena i klika na "Pošalji", stranica će se ponovno učitati i prikazati pozdrav s unesenim imenom, npr. "Hello, Ana".
+
+#### Dodajmo i Bootstrap CSS klase u formu:
+```html
+    <form>
+        <div class="mb-3">
+            <label for="name" class="form-label">Ime</label>
+            <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <button type="submit" class="btn btn-primary">Pošalji</button>
+    </form>
+```
+Objašnjenje Bootstrap klasa
+* ```container```: Ova klasa postavlja glavni sadržaj u centralizirani i responzivni okvir na stranici. container se koristi za stvaranje ograničene širine sadržaja koja automatski odgovara veličini ekrana, što doprinosi urednijem i preglednijem izgledu stranice.
+* ```mt-5```: Ova klasa dodaje "margin-top" (gornji razmak) od 5 jedinica prema Bootstrap skali (jedinica obično iznosi 0,25rem). mt-5 pomaže odmaknuti sadržaj od vrha stranice, čineći ga preglednijim i ugodnijim za čitanje.
+* ```mb-3```: Dodaje "margin-bottom" (donji razmak) od 3 jedinice ispod pojedinog elementa unutar obrasca. Ovdje ga koristimo za odvajanje input polja od gumba, čime unos postaje jasniji i pregledniji.
+* ```form-label```: Ova klasa se primjenjuje na <label> elemente u obrazcima kako bi se osigurao dosljedan stil oznaka, prilagođen izgled obrazaca i čitljivost na svim uređajima.
+* ```form-control```: Jedna od najvažnijih Bootstrap klasa za unos. form-control dodaje stil input poljima i proširuje ih na punu širinu njihovog roditeljskog elementa. Također omogućava prilagodljivost unosa, što znači da će unos izgledati uredno i biti lako dostupan na mobilnim uređajima.
+* ```btn i btn-primary```: btn je osnovna klasa za sve gumbe u Bootstrapu, dok btn-primary dodaje stil primarnog gumba, koji obično dolazi s plavom pozadinom i bijelim tekstom (boje se mogu prilagoditi). Ovaj stil naglašava gumb za slanje, čineći ga prepoznatljivim i lako vidljivim korisnicima.
+
+Kombinacija ovih klasa osigurava responzivnost, preglednost i funkcionalnost obrasca na svim uređajima. S ovim osnovnim Bootstrap klasama, možemo postaviti profesionalno stilizirane oblike koji će automatski prilagoditi svoj izgled veličini ekrana, pružajući bolje korisničko iskustvo.
 
