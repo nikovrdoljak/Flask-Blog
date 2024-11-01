@@ -158,6 +158,7 @@ def post_create():
 ### Prikaz forme za kreiranje posta
 Kreirajte novi predložak ```base.html``` u *templates* mapi i u njega umetnite slijedeći, vrlo jednostavan kod:
 ```html
+{% raw %}
 {% extends "base.html" %}
 
 {% block title %}Uređivanje Blog posta{% endblock %}
@@ -166,6 +167,7 @@ Kreirajte novi predložak ```base.html``` u *templates* mapi i u njega umetnite 
 {% from 'bootstrap5/form.html' import render_form %}
 {{ render_form(form) }}
 {% endblock %}
+{% endraw %}
 ```
 
 ### Link za kreiranje posta i navigacijska traka
@@ -201,13 +203,7 @@ Otvorite base.html predložak, te dodajte Bootstrap navigacijsku traku u tijelo 
 
 Ovaj dizajn navigacijske trake sada omogućava korisnicima pristup glavnoj stranici i stranici za kreiranje posta, a u daljnjim koracima ćemo dodati i dodatne veze prema potrebi.
 
-
-
-
-
-
-
-
+**Testiranje**
 Ako ste sve uspješno odradili, nova verzija aplikacije će imati navigacijsku traku s linkom "Novi post". Kliknite ga i pojavit će se stranica s obrascem za unos posta. Popunite obrazac, i kliknite gumb "Spremi". Vrijenosti obrasca bit će spremljeni u MongoDB bazu.
 
 Ovim koracima omogućili smo unos podataka za novi blog post putem forme i pohranu tih podataka u MongoDB unutar kolekcije posts_collection. U daljnjim koracima proširit ćemo funkcionalnost kako bismo omogućili prikaz, uređivanje i brisanje blog postova.
