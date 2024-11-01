@@ -171,7 +171,7 @@ app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 
 @app.route("/")
-def home():
+def index():
     return render_template("index.html")
 ```
 
@@ -205,7 +205,10 @@ Izmijenite i `base.html` tako da "uključimo" `<div class="container">` kao osno
         {% endraw %}
     </div>
 ```
-**Objašnjenje**: Ovdje smo dodali Bootstrap klasu  `container` za stilizaciju glavnog dijela aplikacije.
+**Objašnjenje**: Ovdje smo dodali dvije Bootstrap klase za stilizaciju glavnog dijela aplikacije.
+* ```container```: Ova klasa postavlja glavni sadržaj u centralizirani i responzivni okvir na stranici. container se koristi za stvaranje ograničene širine sadržaja koja automatski odgovara veličini ekrana, što doprinosi urednijem i preglednijem izgledu stranice.
+* ```mt-5```: Ova klasa dodaje "margin-top" (gornji razmak) od 5 jedinica prema Bootstrap skali (jedinica obično iznosi 0,25rem). mt-5 pomaže odmaknuti sadržaj od vrha stranice, čineći ga preglednijim i ugodnijim za čitanje.
+
 
 Sada bi vaša aplikacija trebala koristiti Bootstrap stilove i komponente, čineći je vizualno privlačnijom. Ovim koracima ste uspješno dodali `bootstrap-flask` biblioteku u vašu Flask aplikaciju.
 
@@ -266,7 +269,7 @@ app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 
 @app.route("/")
-def home():
+def index():
     name = request.args.get("name", "")  # Preuzimamo "name" iz upitnog niza, ili prazan string ako nije postavljeno
     return render_template("index.html", name = name) 
 ```
@@ -300,8 +303,6 @@ Prilikom otvaranja stranice bez unesenog naziva prikazat će se "Hello, Stranger
     </form>
 ```
 Objašnjenje Bootstrap klasa
-* ```container```: Ova klasa postavlja glavni sadržaj u centralizirani i responzivni okvir na stranici. container se koristi za stvaranje ograničene širine sadržaja koja automatski odgovara veličini ekrana, što doprinosi urednijem i preglednijem izgledu stranice.
-* ```mt-5```: Ova klasa dodaje "margin-top" (gornji razmak) od 5 jedinica prema Bootstrap skali (jedinica obično iznosi 0,25rem). mt-5 pomaže odmaknuti sadržaj od vrha stranice, čineći ga preglednijim i ugodnijim za čitanje.
 * ```mb-3```: Dodaje "margin-bottom" (donji razmak) od 3 jedinice ispod pojedinog elementa unutar obrasca. Ovdje ga koristimo za odvajanje input polja od gumba, čime unos postaje jasniji i pregledniji.
 * ```form-label```: Ova klasa se primjenjuje na <label> elemente u obrazcima kako bi se osigurao dosljedan stil oznaka, prilagođen izgled obrazaca i čitljivost na svim uređajima.
 * ```form-control```: Jedna od najvažnijih Bootstrap klasa za unos. form-control dodaje stil input poljima i proširuje ih na punu širinu njihovog roditeljskog elementa. Također omogućava prilagodljivost unosa, što znači da će unos izgledati uredno i biti lako dostupan na mobilnim uređajima.
@@ -318,7 +319,7 @@ Prilagodba app.py da prihvati GET i POST metode
 U app.py, prilagodit ćemo rutu kako bi prihvatila i GET i POST metode te obrađivala podatke na temelju metode koja je korištena.
 ```python
 @app.route("/")
-def home():
+def index():
     name = ""
     if request.method == "POST":
         # Ako je POST, podatke dobijemo iz request.form
@@ -436,9 +437,10 @@ app.secret_key = 'tajni_ključ'  # Ovo postavljamo kao tajni ključ za sigurnost
 ```
 U index.html, dodajmo i ```form.hidden_tag()```. 
 ```html
+{% raw %}
 <form method="post">
     {{ form.hidden_tag() }}
-
+{% endraw %}
 ```
 Ova metoda automatski dodaje skriveni **CSRF token** u formu. CSRF token je važan jer štiti našu aplikaciju od napada poznatih kao Cross-Site Request Forgery. Ovaj napad koristi se kako bi neovlašteno izvršio zahtjev kao da dolazi od 
 ovlaštenog korisnika. Token omogućava aplikaciji da razlikuje legitimne zahtjeve od onih koji bi mogli biti zlonamjerni.
