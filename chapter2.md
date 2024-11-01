@@ -251,7 +251,44 @@ Da bismo vidjeli spremljeni blog post u MongoDB koristimo **MongoDB Compass**. S
 6. Dodatne Opcije:
     * MongoDB Compass nudi opcije poput pretraživanja, filtriranja i sortiranja dokumenata, što može pomoći kod demonstracija složenijih upita i prikaza podataka.
 
+
 ![CompassDB](assets/images/compass-first-post.png)
+
+### Mongo Shell
+Mongo Shell omogućava jednostavne pretrage i manipulacije direktno iz komandne linije.
+Osim u Mongo Compass, spremljene podatke iz MongoDB baze možmo pregledati i koristeći **Mongo Shell**. Mongo Shell omogućava jednostavne pretrage i manipulacije direktno iz komandne linije. Slijedite ove korake:
+
+1. Pokrenite Mongo Shell: U terminalu pokrenite Mongo Shell pomoću komande ```mongo``` ili ```mongosh``` (ovisno o verziji).
+2. Povezivanje s Bazom Podataka: Ako se vaša MongoDB baza nalazi na lokalnom računalu s defaultnim postavkama, možete se direktno povezati. Ako trebate specificirati bazu, koristite:
+```bash
+use pzw_blog_database
+```
+3. Pregled postova u kolekciji: Da biste dohvatili sve blog postove spremljene u kolekciji posts, upišite:
+```js
+db.posts.find()
+```
+
+**Primjer:**
+
+```bash
+PS> mongosh
+Connecting to:          mongodb://127.0.0.1:27017/
+test> use pzw_blog_database
+switched to db pzw_blog_database
+pzw_blog_database> db.posts.find()
+[
+  {
+    _id: ObjectId('6724d74d0cbebd88f61e3b1b'),
+    title: 'Prvi post',
+    content: 'Lorem ipsum',
+    author: 'nvrdoljak@unizd.hr',
+    status: 'draft',
+    date: ISODate('2024-11-01T00:00:00.000Z'),
+    tags: '',
+    date_created: ISODate('2024-11-01T13:27:41.740Z')
+  }
+]
+```
 
 
 
