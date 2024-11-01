@@ -407,16 +407,16 @@ Lista i objašnjenje validatora u WTForms:
 * AnyOf i NoneOf: Provjeravaju sadrži li polje određene vrijednosti ili izbjegava li određene vrijednosti.
 
 **Prilagodba obrasca u index.html i koda u ruti**
-U index.html sada ćemo koristiti Flask-WTF za prikaz forme s prilagođenim poljem name i gumbom submit.
-```html
+U index.html sada ćemo koristiti Flask-WTF za prikaz forme s prilagođenim poljem name i gumbom submit:
+
     <form method="post">
         <div class="mb-3">
-            &#123;&#123; form.name.label(class="form-label") &#125;&#125;
-            &#123;&#123; form.name(class="form-control") &#125;&#125;
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
         </div>
-        &#123;&#123; form.submit(class="btn btn-primary") &#125;&#125;
+        {{ form.submit(class="btn btn-primary") }}
     </form>
-```
+
 U ruti index() sada ćemo koristiti NameForm:
 ```python
 @app.route("/", methods=["GET", "POST"])
