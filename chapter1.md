@@ -239,6 +239,7 @@ Primjer jednostavnog obrasca:
 * method: Određuje način slanja podataka. Najčešće korištene metode su:
     * GET: Podaci se šalju putem URL-a kao dio upitnog niza (query string). Koristi se za jednostavne zahtjeve poput pretraživanja.
     * POST: Podaci se šalju u tijelu zahtjeva i ne prikazuju se u URL-u. Koristi se za osjetljive ili veće podatke, poput prijava i registracija.
+
 #### Upitni Niz (Query String)
 Kod GET metoda, podaci se dodaju u URL kao upitni niz. Primjerice, ako obrazac pošalje podatke s unosom name=Ana, URL bi mogao izgledati ovako:
 http://localhost:5000/?name=Ana
@@ -251,7 +252,8 @@ Osnovne Prakse Kodiranja
 * **Sigurnost**: Kod korištenja POST metode, podatke je bolje slati putem HTTPS protokola za zaštitu osjetljivih informacija.
 Web obrasci čine aplikaciju dinamičnom i interaktivnom, pružajući jednostavan način za komunikaciju između korisnika i aplikacije. U sljedećim poglavljima istražit ćemo kako rukovati podacima iz obrazaca u Flask aplikaciji, spremiti ih u bazu podataka i dodatno proširiti funkcionalnost.
 
-#### Implementacija jednostavnog web obrasca:
+** Implementacija jednostavnog web obrasca:**
+
 Dodajmo obrazac u index.html:
 Primjer jednostavnog obrasca:
 ```html
@@ -291,7 +293,9 @@ Dodatno, iznad forme dodajmo sljedeći kod:
 * Obrazac: U index.html koristimo form element s method="get" (što je zadano) kako bi se podaci poslali putem upitnog niza.
 * Dohvat podataka: U app.py, funkcija index() koristi request.args.get("name") za dohvat unesenog naziva iz upitnog niza.
 * Uvjetni prikaz u predlošku: Ako name nije unesen, prikazat će se tekst "Hello, Stranger", a ako jest, prikazat će se pozdrav s imenom.
+
 **Rezultat**
+
 Prilikom otvaranja stranice bez unesenog naziva prikazat će se "Hello, Stranger". Nakon unosa imena i klika na "Pošalji", stranica će se ponovno učitati i prikazati pozdrav s unesenim imenom, npr. "Hello, Ana".
 
 #### Dodajmo i Bootstrap CSS klase u formu:
@@ -312,7 +316,8 @@ Objašnjenje Bootstrap klasa
 
 Kombinacija ovih klasa osigurava responzivnost, preglednost i funkcionalnost obrasca na svim uređajima. S ovim osnovnim Bootstrap klasama, možemo postaviti profesionalno stilizirane oblike koji će automatski prilagoditi svoj izgled veličini ekrana, pružajući bolje korisničko iskustvo.
 
-#### Prilagodba rute za GET i POST metode
+**Prilagodba rute za GET i POST metode**
+
 Dodajmo logiku koja omogućuje našoj index() ruti prihvaćanje obje metode, GET i POST. Ovisno o metodi zahtjeva, podaci će se dohvaćati iz request.args za GET ili request.form za POST.
 
 Primijenimo ```method="post"``` u form elementu kako bismo poslali podatke putem POST metode: ```<form method="post">```
@@ -339,16 +344,18 @@ def index():
     * Ako je metoda GET, dohvaćamo name iz request.args, što znači da dolazi iz upitnog niza.
 
 #### Problem: "Confirm Form Resubmission"
+
 Kada korisnik pošalje obrazac s POST metodom i osvježi stranicu, može se pojaviti upozorenje "Confirm Form Resubmission" (Potvrdi ponovno slanje obrasca). Ovo se događa jer preglednik prepoznaje POST zahtjev i traži potvrdu za ponovno slanje kako bi spriječio slučajno dupliciranje podataka.
 *Napomena*: Ovaj ćemo problem riješiti kasnije koristeći tehniku "Post/Redirect/Get" (PRG) koja sprječava ponovno slanje podataka prilikom osvježavanja stranice. Trenutno ćemo ostaviti rutu ovakvom, kako prikazali problem, a zatim ćemo ga kasnije otkloniti.
 
 ## WTForms
+
 **WTForms** je Python biblioteka koja omogućava lako kreiranje i obradu web obrazaca u aplikacijama. U Flask okruženju često se koristi proširenje Flask-WTF, koje integrira WTForms sa Flask aplikacijama i dodaje korisne značajke kao što su validacija unosa, CSRF zaštita i jednostavnija obrada podataka. Flask-WTF olakšava rad s obrascima jer omogućava razvijateljima da definiraju i validiraju obrasce unutar Python koda, bez potrebe za pisanjem HTML i JavaScript koda za svaki obrazac. Na taj način se smanjuje složenost i poboljšava sigurnost aplikacije.
 
 Jedan od glavnih razloga za korištenje WTForms je validacija podataka. Validacija osigurava da korisnik unosi točne i sigurne podatke u aplikaciju, a WTForms omogućava različite ugrađene validatore, kao što su provjera duljine unosa, formatiranja e-maila ili raspona brojeva. Također, omogućava korištenje prilagođenih validatora za specifične zahtjeve aplikacije. WTForms automatski prikazuje greške korisnicima ako podaci nisu ispravni, čime olakšava i poboljšava korisničko iskustvo.
 
 
-#### Što je Flask-WTF i kako ga instalirati
+### Što je Flask-WTF i kako ga instalirati
 Flask-WTF je proširenje za Flask koje olakšava rad s web obrascima. Omogućava nam korištenje različitih validacija, generira CSRF (Cross-Site Request Forgery) token za sigurnost i olakšava obradu podataka unutar ruta.
 
 Za instalaciju Flask-WTF koristimo pip naredbu:
@@ -356,7 +363,7 @@ Za instalaciju Flask-WTF koristimo pip naredbu:
 pip install flask-wtf
 ```
 
-#### Kreiranje NameForm klase s validatorima
+### Kreiranje NameForm klase s validatorima
 Sada ćemo kreirati klasu forme NameForm koja će imati jedno polje, name, koje traži unos korisnika. Koristit ćemo DataRequired validator da osiguramo da je polje obavezno.
 ```python
 from flask_wtf import FlaskForm
@@ -397,6 +404,7 @@ U WTForms-u možemo koristiti razna polja obrazaca za rukovanje korisničkim uno
 19. **ColorField** - **Polje za boje**
 
 **Objašnjenje validatora**
+
 Validatori u WTForms provjeravaju vrijednosti koje korisnici unesu u polja. Ako unos ne odgovara pravilima, prikazuje se poruka o grešci.
 
 Lista i objašnjenje validatora u WTForms:
@@ -410,6 +418,7 @@ Lista i objašnjenje validatora u WTForms:
 * AnyOf i NoneOf: Provjeravaju sadrži li polje određene vrijednosti ili izbjegava li određene vrijednosti.
 
 **Prilagodba obrasca u index.html i koda u ruti**
+
 U index.html sada ćemo koristiti Flask-WTF za prikaz forme s prilagođenim poljem name i gumbom submit.
 ```html
     {% raw %}
@@ -457,6 +466,7 @@ Ako pokrenete aplikaciju i pogledate izvorni HTML kod, primjetit ćete token:
 > Bez zaštite CSRF tokenom, aplikacija nije u mogućnosti razlikovati zlonamjerne zahtjeve od stvarnih zahtjeva korisnika, što može dovesti do promjena podataka, slanja osjetljivih podataka ili manipulacija računima. Vidimo da Flask-WTF automatski dodaje CSRF token unutar formi i osigurava da zahtjev dolazi s legitimne stranice, čime se osigurava dodatni sloj sigurnosti.
 
 **Klijentska validacija**
+
 Ako pokušate poslati obrazac bez da ste upisali ime, na klijentskoj strani ćete dobiti poruku *Please fill in this field* što znači da sad naša validacija obrasca funkcionira. To je rezultat korištenja **HTML5 validacije**. Ova funkcionalnost omogućava preglednicima da automatski provjeravaju ispravnost podataka unesenih u formu prije nego što se forma pošalje serveru.
 Evo kako to funkcionira:
 * HTML5 Validacija: Kada se koristi atribut required na HTML elementima, preglednik automatski provodi osnovnu validaciju. Ako korisnik pokuša poslati formu bez popunjavanja obaveznog polja, preglednik prikazuje poruku upozorenja.
@@ -473,6 +483,7 @@ Funkcija ```validate_on_submit()``` omogućava jednostavno rukovanje provjerama 
 > Ukoliko pokušamo promijeniti CSRF token, forma neće biti ispravna u ovom slučaju.
 
 **bootstrap-flask i render_form()**
+
 Koristeći ```render_form(form)``` iz knjižnice bootstrap-flask, možemo neke stvari pojednostavniti i stvoriti dobro stiliziranu formu u aplikaciji koja se pridržava dizajnerskih principa Bootstrapa. Ova funkcija pojednostavljuje proces renderiranja, osiguravajući da su sva polja pravilno formatirana i da se poruke o pogreškama ispravno prikazuju, poboljšavajući ukupno korisničko iskustvo.
 Stoga u index.html zamijenimo cijeli ```<form>...</form>``` blok s:
 ```
@@ -492,7 +503,7 @@ Istražite sljedeću stranicu i pogledajte što sve možete raditi s WTF i Boost
 
 PRG obrazac rješava ovaj problem tako da, nakon što se obrazac pošalje, aplikacija preusmjeri korisnika na drugu stranicu putem GET metode, umjesto da ponovno učitava stranicu s obrascem. To omogućuje da se podaci obrađuju jednom, a zatim korisnik bude preusmjeren na stranicu koja može prikazati rezultate ili poruku o uspjehu.
 
-#### Implementacija PRG obrasca u Flask aplikaciji
+### Implementacija PRG obrasca u Flask aplikaciji
 Evo kako možemo implementirati PRG obrazac u našoj aplikaciji koristeći Flask-WTF.
 
 Evo kako izgleda ažurirana ruta u Flask aplikaciji:
@@ -529,7 +540,7 @@ def index():
     * Ovaj GET zahtjev zapravo prikazuje preusmjereni prikaz stranice (npr., prikaz pozdravne poruke na temelju imena spremljenog u sesiji).
 
 
-## flash poruke
+### flash poruke
 Flask ima ugrađenu metodu flash() koja nam omogućava slanje kratkih obavijesti korisniku. Ove obavijesti su idealne za prikazivanje povratnih informacija, poput poruka o uspješnom ažuriranju imena. bootstrap-flask ima metodu render_messages() koja omogućava automatsko prikazivanje flash poruka sa stilovima Bootstrap-a.
 
 Pomijenimo kod u ruti:
@@ -570,6 +581,7 @@ Dakle, Flash poruka može imati dodatni argument *category* koji određuje vrstu
 U ovom primjeru, flash metoda koristi poruku s tekstom "Promijenili ste ime!" i kategoriju "success".
 
 ** Kategorije Flash Poruka i Bootstrap stilovi** 
+
 Evo popisa najčešće korištenih kategorija s odgovarajućim stilovima u Bootstrapu:
 * success: Prikazuje poruku u zelenoj boji (alert-success). Koristi se za poruke koje označavaju uspješno izvršene radnje.
 * error ili danger: Prikazuje poruku u crvenoj boji (alert-danger). Koristi se za poruke o pogreškama ili neuspješnim radnjama.
