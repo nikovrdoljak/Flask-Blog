@@ -193,7 +193,7 @@ Kreirajte novi predložak ```blog_edit.html``` u *templates* mapi i u njega umet
 ### Link za kreiranje posta i navigacijska traka
 Dodat ćemo link koji vodi na stranicu s formom za kreiranje novog posta. Za tu svrhu dodat ćemo navigacijsku traku s linkom.
 Kako bismo dodali navigacijsku traku koristeći Bootstrap u osnovni predložak (base.html), možemo koristiti ugrađene Bootstrap klase. Ova navigacijska traka imat će naslov Flask-Blog i jednu navigacijsku vezu koja vodi na stranicu za kreiranje posta.
-Otvorite base.html predložak, te dodajte Bootstrap navigacijsku traku u tijelo stranice pomoću sljedećeg HTML koda, odmah ispod ```<div class="container mt-5">```:
+Otvorite base.html predložak, te dodajte Bootstrap navigacijsku traku u tijelo stranice pomoću sljedećeg HTML koda, odmah ispod ```<div class="container">``` (uklonite ```mt-5``` ako je prisutan):
 ```html
     {% raw %}
     {% from 'bootstrap5/nav.html' import render_nav_item %}
@@ -226,6 +226,8 @@ Ovaj dizajn navigacijske trake sada omogućava korisnicima pristup glavnoj stran
 **Testiranje**
 Ako ste sve uspješno odradili, nova verzija aplikacije će imati navigacijsku traku s linkom "Novi post". Kliknite ga i pojavit će se stranica s obrascem za unos posta. Popunite obrazac, i kliknite gumb "Spremi". Vrijenosti obrasca bit će spremljeni u MongoDB bazu.
 
+![Novi post](assets/images/create_post.png)
+
 Ovim koracima omogućili smo unos podataka za novi blog post putem forme i pohranu tih podataka u MongoDB unutar kolekcije posts_collection. U daljnjim koracima proširit ćemo funkcionalnost kako bismo omogućili prikaz, uređivanje i brisanje blog postova.
 
 ### Provjera sadržaja kolekcije postova u bazi
@@ -249,6 +251,9 @@ Da bismo vidjeli spremljeni blog post u MongoDB koristimo **MongoDB Compass**. S
 6. Dodatne Opcije:
     * MongoDB Compass nudi opcije poput pretraživanja, filtriranja i sortiranja dokumenata, što može pomoći kod demonstracija složenijih upita i prikaza podataka.
 
+![CompassDB](assets/images/compass-first-post.png)
+
 
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
+
