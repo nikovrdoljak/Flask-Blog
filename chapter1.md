@@ -411,7 +411,7 @@ U index.html sada ćemo koristiti Flask-WTF za prikaz forme s prilagođenim polj
 ```
     <form method="post">
         <div class="mb-3">
-            {{ form.name.label(class="form-label") }}
+            {{ form1.name.label(class="form-label") }}
             {{ form.name(class="form-control") }}
         </div>
         {{ form.submit(class="btn btn-primary") }}
