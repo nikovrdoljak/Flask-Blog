@@ -408,13 +408,13 @@ Lista i objašnjenje validatora u WTForms:
 
 **Prilagodba obrasca u index.html i koda u ruti**
 U index.html sada ćemo koristiti Flask-WTF za prikaz forme s prilagođenim poljem name i gumbom submit.
-```html
+```
     <form method="post">
         <div class="mb-3">
-            {{ raw }}{{ form.name.label(class="form-label") }}
-            {{ form.name(class="form-control") }}{{ endraw }}
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
         </div>
-        {{ raw }}{{ form.submit(class="btn btn-primary") }}{{ endraw }}
+        {{ form.submit(class="btn btn-primary") }}
     </form>
 ```
 U ruti index() sada ćemo koristiti NameForm:
