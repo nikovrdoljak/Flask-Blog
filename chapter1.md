@@ -411,10 +411,10 @@ U index.html sada ćemo koristiti Flask-WTF za prikaz forme s prilagođenim polj
 ```html
     <form method="post">
         <div class="mb-3">
-            {{ form.name.label(class="form-label") }}
-            {{ form.name(class="form-control") }}
+            {{ raw }}{{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}{{ endraw }}
         </div>
-        {{ form.submit(class="btn btn-primary") }}
+        {{ raw }}{{ form.submit(class="btn btn-primary") }}{{ endraw }}
     </form>
 ```
 U ruti index() sada ćemo koristiti NameForm:
@@ -422,9 +422,9 @@ U ruti index() sada ćemo koristiti NameForm:
 @app.route("/", methods=["GET", "POST"])
 def index():
     form = NameForm()
-    name = form.name.data if request.method == "POST" else "Stranger"
+    name = form.name.data if request.method == "POST" else ""
     
-    return render_template("index.html", pozdrav=pozdrav, form=form)
+    return render_template("index.html", name=name, form=form)
 ```
 Ako sad pokrenemo aplikaciju dobit ćemo grešku *"RuntimeError: A secret key is required to use CSRF."* Razlog za to jest da Flask-WTF automatski uključuje CSRF zaštitu.
 Kako bismo omogućili CSRF zaštitu, Flask aplikacija treba imati SECRET_KEY. Dodajmo ga u kod:
