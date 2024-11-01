@@ -113,7 +113,7 @@ Dakle, ovaj kod omogućuje aplikaciji da:
 
 ### Kreiranje BlogPostForm klase
 
-Prvo, definirat ćemo formu koja će sadržavati potrebna polja za blog post. Klasa će izgledati ovako:
+Slijedeći korak je definiranje obrasca (forme) koja će sadržavati potrebna polja za blog post. Klasa će izgledati ovako:
 
 ```python
 from wtforms import StringField, TextAreaField, DateField, FileField
@@ -131,6 +131,16 @@ class BlogPostForm(FlaskForm):
     image = FileField('Blog Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!')])
     submit = SubmitField('Spremi')
 ```
+Ova klasa definirana je na način sličan klasi NameForm iz prethodnog poglavlja, i predstavlja model obrasca našeg blog posta. No pgledajmo koje nove značajke susrećemo ovdje:
+* Polja title i author su StringField koja pohranjuju naslov i ime autora. Koriste validator DataRequired() kako bi osigurao da su polja popunjena.
+* Length(min=5, max=100): Provjerava da je uneseni tekst između 5 i 100 znakova.
+* Polje content je TextAreaField, namijenjeno za unos duljeg teksta (sadržaja blog posta). Nema dodanih validatora, pa je unos u ovo polje opcionalan.
+    * Kasnije ćemo dodati mogućnost unosa sadržaja u MD Markup formatu.
+* Polje date je DateField koje koristi trenutni datum kao zadanu vrijednost putem datetime.today.
+* Polje status je RadioField, koje omogućuje korisniku da odabere između dvije opcije: draft (Skica) i published (Objavljeno). Zadana vrijednost je draft, što znači da će svaki post biti spremljen kao skica osim ako korisnik ne odabere objavljivanje.
+* Polje tags je StringField za unos oznaka povezanih s postom. Oznake se mogu koristiti za kategorizaciju ili pretraživanje sadržaja, a unos je opcionalan. 
+* Polje image je FileField koje omogućuje korisniku dodavanje slike uz post. Koristi validator FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!') koji dopušta samo određene tipove datoteka (JPEG i PNG slike). Ako korisnik pokuša dodati datoteku drugog tipa, prikazat će se poruka "Samo slike!".
+    * Podršku za unos slika ćemo dodati kasnije.
 
 
 ### Ruta za kreiranje novog posta
@@ -155,8 +165,15 @@ def post_create():
     return render_template('blog_edit.html', form=form)
 ```
 
+Ova ruta izgleda slično onoj iz prethodnog poglavlja. Nakon validacije, svi uneseni podaci iz obrasca dohvaćaju se pomoću ```.data``` atributa i pohranjuju u novi rječnik ```post```. 
+
+Dalje se koristi ```insert_one()``` metoda iz pymongo biblioteke kako bi se novi post pohranio u MongoDB kolekciju pod nazivom ```posts_collection```. Svaki put kad korisnik pošalje novu obrazac, stvara se novi dokument u bazi. Metoda ```flash()``` prikazuje poruku korisniku nakon uspješnog unosa, te se preusmejravamo na rutu ```index()```.
+
+Ako obrazac nije poslan ili ako ima pogreške u unosu, prikazuje se ```blog_edit.html``` predložak s formom obrascem kako bi korisnik mogao vidjeti obrazac ili ispraviti eventualne greške. Stoga kreirajmo taj novi predložak.
+
+
 ### Prikaz forme za kreiranje posta
-Kreirajte novi predložak ```base.html``` u *templates* mapi i u njega umetnite slijedeći, vrlo jednostavan kod:
+Kreirajte novi predložak ```blog_edit.html``` u *templates* mapi i u njega umetnite slijedeći, vrlo jednostavan kod:
 ```html
 {% raw %}
 {% extends "base.html" %}
@@ -207,6 +224,26 @@ Ovaj dizajn navigacijske trake sada omogućava korisnicima pristup glavnoj stran
 Ako ste sve uspješno odradili, nova verzija aplikacije će imati navigacijsku traku s linkom "Novi post". Kliknite ga i pojavit će se stranica s obrascem za unos posta. Popunite obrazac, i kliknite gumb "Spremi". Vrijenosti obrasca bit će spremljeni u MongoDB bazu.
 
 Ovim koracima omogućili smo unos podataka za novi blog post putem forme i pohranu tih podataka u MongoDB unutar kolekcije posts_collection. U daljnjim koracima proširit ćemo funkcionalnost kako bismo omogućili prikaz, uređivanje i brisanje blog postova.
+
+### Provjera sadržaja kolekcije postova u bazi
+
+Da bismo vidjeli spremljeni blog post u MongoDB koristimo MongoDB Compass. Slijedite ove korake:
+
+1. Pokretanje MongoDB Compass: Otvorite MongoDB Compass aplikaciju na svom računalu. MongoDB Compass omogućava vizualno istraživanje i upravljanje podacima pohranjenim u MongoDB bazi.
+2. Povezivanje s MongoDB: Na početnom zaslonu MongoDB Compass-a upišite URL za povezivanje sa svojom lokalnom bazom podataka. Za lokalno postavljen MongoDB, URL obično izgleda ovako:
+```mongodb://localhost:27017/```
+Kliknite na "Connect" kako biste se povezali s MongoDB-om.
+3. Pristupanje bazi i kolekciji:
+    * Nakon uspješnog povezivanja, u lijevom izborniku vidjet ćete popis baza podataka. Pronađite svoju bazu, u ovom slučaju, ```pzw_blog_database```.
+    * Kliknite na bazu kako biste otvorili popis kolekcija, zatim odaberite kolekciju ```posts```.
+4. Pregled Postova:
+    * Unutar kolekcije "posts" možete vidjeti sve spremljene dokumente. Ovdje će biti prikazani svi blog postovi koje ste pohranili, svaki kao pojedinačan dokument.
+    * Prvi blog post koji ste unijeli putem aplikacije trebao bi biti vidljiv ovdje. Moći ćete pregledati polja kao što su ```title```, ```content```, ```author```, ```date```, i ```tags```.
+5. Pregledavanje i uređivanje:
+    * Možete kliknuti na svaki dokument kako biste vidjeli detalje. Također, MongoDB Compass nudi opcije za uređivanje, brisanje ili dodavanje novih dokumenata ako želite pokazati dodatne funkcionalnosti studentima.
+6. Dodatne Opcije:
+    * MongoDB Compass nudi opcije poput pretraživanja, filtriranja i sortiranja dokumenata, što može pomoći kod demonstracija složenijih upita i prikaza podataka.
+
 
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
