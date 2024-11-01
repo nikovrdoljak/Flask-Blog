@@ -207,6 +207,7 @@ Izmijenite i `base.html` tako da "uključimo" `<div class="container">` kao osno
 ```
 **Objašnjenje**: Ovdje smo dodali dvije Bootstrap klase za stilizaciju glavnog dijela aplikacije.
 * ```container```: Ova klasa postavlja glavni sadržaj u centralizirani i responzivni okvir na stranici. container se koristi za stvaranje ograničene širine sadržaja koja automatski odgovara veličini ekrana, što doprinosi urednijem i preglednijem izgledu stranice.
+Za detalje o Bootstrap klasi ```.container```, pogledajte [Bootstrap Containers dokumentaciju](https://getbootstrap.com/docs/5.0/layout/containers/).
 * ```mt-5```: Ova klasa dodaje "margin-top" (gornji razmak) od 5 jedinica prema Bootstrap skali (jedinica obično iznosi 0,25rem). mt-5 pomaže odmaknuti sadržaj od vrha stranice, čineći ga preglednijim i ugodnijim za čitanje.
 
 
