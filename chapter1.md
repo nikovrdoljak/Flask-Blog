@@ -209,6 +209,7 @@ Izmijenite i `base.html` tako da "uključimo" `<div class="container">` kao osno
 * ```container```: Ova klasa postavlja glavni sadržaj u centralizirani i responzivni okvir na stranici. container se koristi za stvaranje ograničene širine sadržaja koja automatski odgovara veličini ekrana, što doprinosi urednijem i preglednijem izgledu stranice.
 Za detalje o Bootstrap klasi ```.container```, pogledajte [Bootstrap Containers dokumentaciju](https://getbootstrap.com/docs/5.0/layout/containers/).
 * ```mt-5```: Ova klasa dodaje "margin-top" (gornji razmak) od 5 jedinica prema Bootstrap skali (jedinica obično iznosi 0,25rem). mt-5 pomaže odmaknuti sadržaj od vrha stranice, čineći ga preglednijim i ugodnijim za čitanje.
+Za detalje o Bootstrap marginama i razmacima općenito, pogledajte [Bootstrap Spacing dokumentaciju](https://getbootstrap.com/docs/5.0/utilities/spacing/).
 
 
 Sada bi vaša aplikacija trebala koristiti Bootstrap stilove i komponente, čineći je vizualno privlačnijom. Ovim koracima ste uspješno dodali `bootstrap-flask` biblioteku u vašu Flask aplikaciju.
@@ -449,6 +450,13 @@ Ako pokrenete aplikaciju i pogledate izvorni HTML kod, primjetit ćete token:
 ```html
 <input id="csrf_token" name="csrf_token" type="hidden" value="Ijc0ZWVkOTg3YjkwOWVmMjIzZjA5N2UzYmViYTVjM2QxYTU5MDhkYTMi.ZyN4dQ.OeumUug9Knq2TfqCbSDsDbEeUJ4">
 ```
+
+**Dodatno pojašnjenje:**
+> Na primjer, napadač može korisnika navesti da klikne na zlonamjerni link ili posjeti stranicu koja pokreće zahtjev prema vašoj aplikaciji bez korisnikovog znanja. Budući da preglednik automatski šalje sve kolačiće za prijavljene korisnike (kao što su kolačići za autentifikaciju), aplikacija može pogrešno vjerovati da je zahtjev legitimno poslan od strane korisnika.
+
+> Bez zaštite CSRF tokenom, aplikacija nije u mogućnosti razlikovati zlonamjerne zahtjeve od stvarnih zahtjeva korisnika, što može dovesti do promjena podataka, slanja osjetljivih podataka ili manipulacija računima. Vidimo da Flask-WTF automatski dodaje CSRF token unutar formi i osigurava da zahtjev dolazi s legitimne stranice, čime se osigurava dodatni sloj sigurnosti.
+
+
 Ako pokušate poslati obrazac bez da ste upisali ime, na klijentskoj strani ćete dobiti poruku *Please fill in this field.* što znači da sad naša validacija obrasca funkcionira.
 No bez obzira na ovo, još uvijek nismo uključili validaciju na poslužiteljskom kodu. Stoga dodajmo još jednu promijenu:
 ```python
