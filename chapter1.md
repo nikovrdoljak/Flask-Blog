@@ -456,13 +456,21 @@ Ako pokrenete aplikaciju i pogledate izvorni HTML kod, primjetit ćete token:
 
 > Bez zaštite CSRF tokenom, aplikacija nije u mogućnosti razlikovati zlonamjerne zahtjeve od stvarnih zahtjeva korisnika, što može dovesti do promjena podataka, slanja osjetljivih podataka ili manipulacija računima. Vidimo da Flask-WTF automatski dodaje CSRF token unutar formi i osigurava da zahtjev dolazi s legitimne stranice, čime se osigurava dodatni sloj sigurnosti.
 
+**Klijentska validacija**
+Ako pokušate poslati obrazac bez da ste upisali ime, na klijentskoj strani ćete dobiti poruku *Please fill in this field* što znači da sad naša validacija obrasca funkcionira. To je rezultat korištenja **HTML5 validacije**. Ova funkcionalnost omogućava preglednicima da automatski provjeravaju ispravnost podataka unesenih u formu prije nego što se forma pošalje serveru.
+Evo kako to funkcionira:
+* HTML5 Validacija: Kada se koristi atribut required na HTML elementima, preglednik automatski provodi osnovnu validaciju. Ako korisnik pokuša poslati formu bez popunjavanja obaveznog polja, preglednik prikazuje poruku upozorenja.
+* Flask-WTF Integracija: Flask-WTF omogućava rad s ovim HTML5 atributima putem definicije formi. Kada se koriste validatori kao što su DataRequired, oni mogu automatski dodati atribut required na polje forme, što aktivira preglednikovu integriranu validaciju.
+* Preporuke: Iako HTML5 validacija može biti korisna, moramo implementirati i validacije na poslužitelju kako bi se osigurala sigurnost aplikacije i pravilno rukovanje podacima, bez obzira na korisnički preglednik ili njegove postavke.
 
-Ako pokušate poslati obrazac bez da ste upisali ime, na klijentskoj strani ćete dobiti poruku *Please fill in this field.* što znači da sad naša validacija obrasca funkcionira.
-No bez obzira na ovo, još uvijek nismo uključili validaciju na poslužiteljskom kodu. Stoga dodajmo još jednu promijenu:
+Stoga dodajmo još jednu promijenu:
 ```python
     name = form.name.data if form.validate_on_submit() else "" 
 ```
-Ukoliko pokušamo promijeniti CSRF token, forma neće biti ispravna u ovom slučaju.
+
+Funkcija ```validate_on_submit()``` omogućava jednostavno rukovanje provjerama formi prilikom obrade podataka. Kada se pozove, ova funkcija provjerava je li forma poslana (tj. je li metoda zahtjeva POST) i zatim provodi sve definirane validatore na poljima forme. Ako su svi podaci ispravni, funkcija vraća ```True```, što omogućuje daljnju obradu podataka, dok vraća ```False``` ako postoji greška.
+
+> Ukoliko pokušamo promijeniti CSRF token, forma neće biti ispravna u ovom slučaju.
 
 **bootstrap-flask i render_form()**
 Koristeći ```render_form(form)``` iz knjižnice bootstrap-flask, možemo neke stvari pojednostavniti i stvoriti dobro stiliziranu formu u aplikaciji koja se pridržava dizajnerskih principa Bootstrapa. Ova funkcija pojednostavljuje proces renderiranja, osiguravajući da su sva polja pravilno formatirana i da se poruke o pogreškama ispravno prikazuju, poboljšavajući ukupno korisničko iskustvo.
