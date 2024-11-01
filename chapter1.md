@@ -252,7 +252,7 @@ Osnovne Prakse Kodiranja
 * **Sigurnost**: Kod korištenja POST metode, podatke je bolje slati putem HTTPS protokola za zaštitu osjetljivih informacija.
 Web obrasci čine aplikaciju dinamičnom i interaktivnom, pružajući jednostavan način za komunikaciju između korisnika i aplikacije. U sljedećim poglavljima istražit ćemo kako rukovati podacima iz obrazaca u Flask aplikaciji, spremiti ih u bazu podataka i dodatno proširiti funkcionalnost.
 
-** Implementacija jednostavnog web obrasca:**
+**Implementacija jednostavnog web obrasca:**
 
 Dodajmo obrazac u index.html:
 Primjer jednostavnog obrasca:
@@ -580,7 +580,7 @@ U baznom predlošku (base.html) koristit ćemo render_messages() metodu iz boots
 Dakle, Flash poruka može imati dodatni argument *category* koji određuje vrstu poruke (npr. uspjeh, pogreška). Flask podržava razne kategorije, a bootstrap-flask ih prikazuje u boji prema Bootstrap stilu.
 U ovom primjeru, flash metoda koristi poruku s tekstom "Promijenili ste ime!" i kategoriju "success".
 
-** Kategorije Flash Poruka i Bootstrap stilovi** 
+**Kategorije Flash Poruka i Bootstrap stilovi** 
 
 Evo popisa najčešće korištenih kategorija s odgovarajućim stilovima u Bootstrapu:
 * success: Prikazuje poruku u zelenoj boji (alert-success). Koristi se za poruke koje označavaju uspješno izvršene radnje.

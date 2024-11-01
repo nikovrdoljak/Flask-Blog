@@ -48,13 +48,4 @@ U sljedećem koraku, integrirat ćemo MongoDB s Flask aplikacijom za spremanje i
 
 
 
-
-
-
-
-
-
-
-
-
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)

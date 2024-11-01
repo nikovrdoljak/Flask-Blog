@@ -18,3 +18,9 @@
 span.credits.right {
     display: none;
 }
+
+@media (max-width: 768px) {
+    span.credits.right {
+        display: none;
+    }
+}

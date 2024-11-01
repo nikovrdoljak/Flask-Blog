@@ -1,5 +1,5 @@
 title: "Flask Tutorial"
-description: "A beginner's guide to web development with Flask"
+description: "Vodič za izradu Flask Blog aplikacije"
 theme: jekyll-theme-midnight
 css: "assets/css/custom.css"
 markdown: kramdown
