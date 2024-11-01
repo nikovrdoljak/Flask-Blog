@@ -1,6 +1,8 @@
 <link rel="stylesheet" href="assets/css/custom.css">
 
 # Uvod u baze podataka i njihovu primjenu u aplikacijama
+U ovom poglavlju specificirat ćemo zahtjeve naše aplikacije za upravljanje blog postovima, te započeti s njenom implementacijom. No prije toga ćemo ukratko predstaviti koncept baze podataka, koju ćemo koristiti za spremanje postova i ostalih entiteta naše aplikacije. 
+
 Baze podataka su ključne za pohranjivanje podataka koje aplikacija koristi i obrađuje, poput korisničkih informacija, sadržaja i drugih vrsta podataka. One omogućuju trajno spremanje podataka, pristup njima, pretragu, ažuriranje i brisanje na strukturiran način. Umjesto pohranjivanja podataka u privremenu memoriju ili datoteke, baze podataka omogućuju rad s velikim količinama podataka na učinkovit i siguran način, čuvajući integritet podataka.
 
 U aplikacijama poput bloga (koju ćemo mi raditi), baza podataka omogućuje spremanje članaka, komentara, korisničkih informacija i drugih elemenata potrebnih za funkcionalnost bloga. Korištenjem baze podataka, možemo jednostavno dohvatiti, filtrirati i prikazati postove.
@@ -44,6 +46,26 @@ mongod --dbpath /putanja/do/vašeg/db/foldera
 * Povezivanje s MongoDB-om: Nakon instalacije, MongoDB će raditi na localhostu, portu 27017. Koristit ćemo ga našoj u Flask aplikaciji pomoću Pythona i biblioteke kao što je pymongo.
 
 U sljedećem koraku, integrirat ćemo MongoDB s Flask aplikacijom za spremanje i dohvaćanje blog postova.
+
+## Specifikacija Blog aplikacije
+
+Aplikacija će koristiti Flask, Bootstrap-Flask za stilizaciju, Flask-WTF za obradu formi i MongoDB kao bazu podataka za pohranu podataka o postovima. U ovom poglavlju naš cilj je stvoriti jednostavnu, ali funkcionalnu aplikaciju koja omogućava korisnicima kreiranje, uređivanje, brisanje i pregled blog postova.
+
+### Glavne funkcionalnosti aplikacije:
+* **Lista postova**: Korisnici će moći pregledavati sve blog postove na jednoj stranici. Svaki post će sadržavati naslov, sažetak i osnovne informacije poput autora i datuma.
+* **Pregled pojedinačnih postova**: Klikom na post, korisnici će biti preusmjereni na stranicu koja prikazuje puni sadržaj postа, uključujući slike i tagove.
+* **Kreiranje postova**: Aplikacija će omogućiti autorima da kreiraju nove postove putem forme. Ova forma će uključivati potrebna polja kao što su naslov, sadržaj, autor, datum, oznake i slika.
+* **Uređivanje postova**: Autori će moći uređivati postojeće postove. To će uključivati ponovno prikazivanje forme s prethodno unesenim podacima, omogućujući autorima da izvrše izmjene.
+* **Brisanje postova**: Korisnici će moći brisati postove, čime će se trajno ukloniti podaci iz baze.
+
+### Struktura modela podataka
+Svaki blog post će imati sljedeće atribute:
+* Naslov (title): Kratak opis postа koji će biti prikazan na listi postova.
+* Sadržaj (content): Glavni tekst postа.
+* Autor (author): Ime osobe koja je napisala post.
+* Datum (date): Datum kada je post kreiran.
+* Oznake (tags): Kategorije ili ključne riječi povezane s postom, omogućujući korisnicima lakše pretraživanje.
+* Slika (image): veza prema slici koja će biti prikazana u postu.
 
 
 
