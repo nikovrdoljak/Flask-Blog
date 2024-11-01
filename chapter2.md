@@ -1,5 +1,8 @@
 <link rel="stylesheet" href="assets/css/custom.css">
 
+[Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
+
+
 # Uvod u baze podataka i njihovu primjenu u aplikacijama
 U ovom poglavlju specificirat ćemo zahtjeve naše aplikacije za upravljanje blog postovima, te započeti s njenom implementacijom. No prije toga ćemo ukratko predstaviti koncept baze podataka, koju ćemo koristiti za spremanje postova i ostalih entiteta naše aplikacije. 
 
@@ -227,12 +230,14 @@ Ovim koracima omogućili smo unos podataka za novi blog post putem forme i pohra
 
 ### Provjera sadržaja kolekcije postova u bazi
 
-Da bismo vidjeli spremljeni blog post u MongoDB koristimo MongoDB Compass. Slijedite ove korake:
+Da bismo vidjeli spremljeni blog post u MongoDB koristimo **MongoDB Compass**. Slijedite ove korake:
 
 1. Pokretanje MongoDB Compass: Otvorite MongoDB Compass aplikaciju na svom računalu. MongoDB Compass omogućava vizualno istraživanje i upravljanje podacima pohranjenim u MongoDB bazi.
+
 2. Povezivanje s MongoDB: Na početnom zaslonu MongoDB Compass-a upišite URL za povezivanje sa svojom lokalnom bazom podataka. Za lokalno postavljen MongoDB, URL obično izgleda ovako:
-```mongodb://localhost:27017/```
-Kliknite na "Connect" kako biste se povezali s MongoDB-om.
+    * ```mongodb://localhost:27017/```
+    * Kliknite na "Connect" kako biste se povezali s MongoDB-om.
+
 3. Pristupanje bazi i kolekciji:
     * Nakon uspješnog povezivanja, u lijevom izborniku vidjet ćete popis baza podataka. Pronađite svoju bazu, u ovom slučaju, ```pzw_blog_database```.
     * Kliknite na bazu kako biste otvorili popis kolekcija, zatim odaberite kolekciju ```posts```.

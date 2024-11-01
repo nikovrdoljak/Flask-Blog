@@ -1,5 +1,7 @@
 <link rel="stylesheet" href="assets/css/custom.css">
 
+[Naslovna stranica](README.md) | [Slijedeće poglavlje: Rad s bazom podataka](chapter2.md)
+
 # Poglavlje 1: Flask i web obrasci
 
 ## Hello world aplikacija
