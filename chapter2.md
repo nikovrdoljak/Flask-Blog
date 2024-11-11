@@ -290,6 +290,159 @@ pzw_blog_database> db.posts.find()
 ]
 ```
 
+Sami odaberite koju aplikaciju ćete koristiti za rad s MongoDB-om: Compass ili Shell.
+
+### Prikaz postova na glavnoj stranici
+
+Za prikazivanje blog postova s statusom "published" u početnoj (index) ruti, prvo ćemo dohvatiti sve postove iz MongoDB-a koji imaju status "published". Zatim ćemo ih prikazati u izmijenjenom Jinja predlošku.
+
+Prvo, trebamo prilagoditi rutu i dohvatiti podatke iz baze podataka. Zatim ćemo izmijeniti predložak za prikaz tih podataka.
+
+**Ažuriranje rute**
+Ažurirajmo index rutu da dohvaća samo objavljene postove iz kolekcije ```posts_collection```. Izbrišimo što smo u njoj do sad imali i stavimo:
+```python
+@app.route("/", methods=["GET", "POST"])
+def index():
+    published_posts = posts_collection.find({"status": "published"}).sort('date', -1)
+    return render_template('index.html', posts = published_posts)
+```
+Ovdje koristimo ```posts_collection.find({"status": "published"}).sort('date', -1)``` kako bismo dohvatili samo postove s statusom "published". ```sort('date', -1)```  metoda sortira postove prema polju ```date```. Argument -1 označava opadajući redoslijed (najnoviji postovi se nalaze na vrhu). Ako želite rastući redoslijed, koristit ćete 1 umjesto -1.
+
+Promijenimo i index.html predložak. U njemu ćemo iterirat kroz listu postova i prikazati podatke poput naslova, autora, datuma, oznaka i sadržaja. Poveznicu na detalje posta (koju ćemo implementirati kasnije) postavit ćemo na naslovu.
+
+```html
+{% extends "base.html" %}
+{% block title %}Početna stranica{% endblock %}
+{% block head %}
+	{{ super() }}
+	<style>
+	</style>
+{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">Flask-Blog</h1>
+
+<ul class="col-8 list-unstyled">
+    {% for post in posts %}
+    <li>
+        <h2><a href="#" class="text-dark text-decoration-none">{{ post.title }}</a></h2>
+        <p><strong>Autor:</strong> {{ post.author }} - {{ post.date.strftime('%d.%m.%Y') }}</p>
+        <p class="mt-2">{% for tag in post.tags.split(',') %}
+            <span class="badge bg-primary">{{ tag }}</span>
+        {% endfor %}</p>
+        <p>{{ post['content'][:150] }}</p>
+        <hr>
+    </li>
+    {% endfor %}    
+</ul>
+
+{% endblock %}
+```
+
+**Objašnjenje dijelova koda**
+* Datum formatiramo u ```d.M.YYYY``` oblik pomoću ```strftime``` funkcije.
+* Prikazujemo samo prvih 150 znakova sadržaja posta.
+* Razdvajamo oznake po zarezima ```split(',')``` funkcijom, a ```badge bg-primary``` daje oznakama izgled male značke s plavom bojom.
+
+### Prikaz pojedinačnog posta
+Implementirat ćemo rutu ```/blog/<post_id>``` koja će prikazivati detalje posta, te omogućiti uređivanje i brisanje postova, pa nastavimo.
+
+Prvo ćemo definirati rutu koja će dohvatiti post pomoću ```post_id```, a zatim prikazati njegov sadržaj u novom predlošku ```blog_edit.html```.
+
+```python
+from bson.objectid import ObjectId
+
+@app.route('/blog/<post_id>')
+def post_view(post_id):
+    post = posts_collection.find_one({'_id': ObjectId(post_id)})
+
+    if not post:
+        flash("Post nije pronađen!", "danger")
+        return redirect(url_for('index'))
+
+    return render_template('blog_view.html', post=post)
+```
+
+Kreirajno i novi predložak ```blog_view.html``` koji će prikazati post:
+```html
+{% extends "base.html" %}
+{% block title %}{{post.title}}{% endblock %}
+{% block head %}
+	{{ super() }}
+	<style>
+	</style>
+{% endblock %}
+
+{% block body %}
+    <div class="col-8">
+        <h2>{{post.title}}</h2>
+        <h5 class="mt-5">{{post.author}} - {{post.date.strftime('%d.%m.%Y')}}</h5>
+        <p class="mt-2">{% for tag in post.tags.split(',') %}
+            <span class="badge bg-primary">{{ tag }}</span>
+        {% endfor %}</p>
+        <p class="mt-5">{{post.content }}</p>
+        <div>
+            <a href="#" type="button" class="btn btn-primary btn-sm">Uredi</a>
+            <a href="#" type="button" class="btn btn-danger btn-sm">Briši</a>
+        </div>
+    </div>
+{% endblock %}
+```
+
+Na kraju promijenimo u ```index.html``` link na detalje:
+```html
+<h2><a href="{{ url_for('view_post', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>
+```
+
+Ako sad kliknemo na naslov posta na glavnom stranici, otvorit će se stranica samo s tim postom. 
+
+Na dnu posta smo dodali i dva gumba koje ćemo koristiti za uređivanje i brisanje posta, pa krenimo i s tim dijelom.
+
+### Uređivanje posta
+Da bismo urediti sadržaj posta kreirat ćemo novu rutu, a na gumb "Uredi" postavit ćemo link na rutu.
+Izmijenimo gumb "Uredi":
+```html
+<a href="{{ url_for('post_edit', post_id=post['_id']) }}" type="button" class="btn btn-primary btn-sm">Uredi</a>
+```
+
+Dodajmo novu rutu:
+```python
+@app.route('/blog/edit/<post_id>', methods=["get", "post"])
+def post_edit(post_id):
+    form = BlogPostForm()
+    post = posts_collection.find_one({"_id": ObjectId(post_id)})
+
+    if request.method == 'GET':
+        form.title.data = post['title']
+        form.content.data = post['content']
+        form.author.data = post['author']
+        form.date.data = post['date']
+        form.tags.data = post['tags']
+        form.status.data = post['status']
+    elif form.validate_on_submit():
+        posts_collection.update_one(
+            {"_id": ObjectId(post_id)},
+            {"$set": {
+                'title': form.title.data,
+                'content': form.content.data,
+                'date': datetime.combine(form.date.data, datetime.min.time()),
+                'tags': form.tags.data,
+                'status': form.status.data,
+                'date_updated': datetime.utcnow()
+            }}
+        )
+        flash('Post je uspješno ažuriran.', 'success')
+        return redirect(url_for('post_view', post_id = post_id))
+    else:
+        flash('Dogodila se greška!', category='warning')
+    return render_template('blog_edit.html', form=form)
+```
+**Pojašnjenje koda**
+Nova  ```post_edit``` ruta radi na način sličan kako smo u prehodnom poglavlju pojasnili rad s formama.
+* Kad korisnik klikne "Uredi" GET metoda se poziva, s ID-om posta. Iz baze dohvaćamo podatke i popunjavamo BlogPostForm objekt s vrijednostima iz baze, te prikazujemo isti predložak ```blog_edit.html``` kao i kod unosa novog posta.
+* Kad korisnik izmijeni sadržaj posta i klikne "Spremi" gumb, poziva se POST metoda, te se provjerava validnost vrijesnoti forme ```form.validate_on_submit()``` metodom. Ukoliko je sve u redu, ažurirat ćemo vrijesnot zapisa u bazi pomoću ```posts_collection.update_one``` metode, salje se poruka o uspješno izvršenoj radnji, te se ponovo prikazujemo post.
+* U slučaju greške (npr. promijenimo CSRF token i sl.), prikazat će se poruka o grešci, te će korisnik biti preusmjeren na ponovno uređenje forme.
+
 
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
