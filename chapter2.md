@@ -447,7 +447,63 @@ Nova  ```post_edit``` ruta radi na način sličan kako smo u prehodnom poglavlju
 * Kad korisnik izmijeni sadržaj posta i klikne "Spremi" gumb, poziva se POST metoda, te se provjerava validnost vrijesnoti forme ```form.validate_on_submit()``` metodom. Ukoliko je sve u redu, ažurirat ćemo vrijesnot zapisa u bazi pomoću ```posts_collection.update_one``` metode, salje se poruka o uspješno izvršenoj radnji, te se ponovo prikazujemo post.
 * U slučaju greške (npr. promijenimo CSRF token i sl.), prikazat će se poruka o grešci, te će korisnik biti preusmjeren na ponovno uređenje forme.
 
+### Brisanje posta
+Sljedeći korak je brisanje posta. I u ovom slučaju ćemo kreirati novu rutu, no u slučaju klika na gumb "Briši" pitat ćemo korisnika da li je siguran da želi pobrisati post. 
 
+Koristit čemo Bootstrap komponentu [Modal](https://getbootstrap.com/docs/5.3/components/modal/) za prikaz dijaloga za potvrdu. *Modal* nam omogućuje da prikažemo prozor s gumbima za potvrdu ili otkazivanje određene radnje. Stoga promijenimo najprije "Briši" gumb u ```blog_view.html```:
+
+```html
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                data-postid="{{ post['_id'] }}">
+                Briši
+            </button>
+```
+Ukratko, ovdje koristimo ```data-bs-toggle``` za povezivanje s modalom prozorom (```#deleteModal```) i ```data-postid``` za prosljeđivanje ID-a posta JavaScript kod, kojeg ćemo proslijediti kao post za brisanje.
+
+Nadalje za korištenje *Modal* komponente, treba nam dodatak HTML i JavaScript kod. Dodajmo ga na kraj ```blog_view.html``` predloška:
+
+```html
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Potvrda brisanja</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Da li ste sigurni da želite obrisati ovaj post?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Odustani</button>
+                <form id="deleteForm" method="POST" action="" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Briši</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const deleteModal = document.getElementById('deleteModal');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const postId = button.getAttribute('data-postid');
+        const deleteForm = document.getElementById('deleteForm');
+        deleteForm.action = `/blog/delete/${postId}`;
+    });
+</script>
+```
+Ovaj kod prikazuje Bootstrap *Modal* za potvrdu brisanja posta. Kada se modal otvori, JavaScript kod dohvaća jedinstveni ID posta (pomoću atributa data-postid iz gumba) i ažurira URL za deleteForm obrazac. Na taj način se šalje ispravni ID posta za brisanje kada potvrdimo brisanje.
+
+Još moramo dodati i Flask rutu za brisanje:
+```python
+@app.route('/blog/delete/<post_id>', methods=['POST'])
+def delete_post(post_id):
+    posts_collection.delete_one({"_id": ObjectId(post_id)})
+    flash('Post je uspješno obrisan.', 'success')
+    return redirect(url_for('index'))
+```
+Ova ruta dohvaća ID posta iz URL-a, briše odgovarajući zapis iz ```posts_collection``` u MongoDB-u, prikazuje poruku o uspješnom brisanju, te preusmjerava na glavnu stranicu.
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
 
