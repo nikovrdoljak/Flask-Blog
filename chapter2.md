@@ -311,6 +311,7 @@ Ovdje koristimo ```posts_collection.find({"status": "published"}).sort('date', -
 Promijenimo i index.html predložak. U njemu ćemo iterirat kroz listu postova i prikazati podatke poput naslova, autora, datuma, oznaka i sadržaja. Poveznicu na detalje posta (koju ćemo implementirati kasnije) postavit ćemo na naslovu.
 
 ```html
+{% raw %}
 {% extends "base.html" %}
 {% block title %}Početna stranica{% endblock %}
 {% block head %}
@@ -337,6 +338,7 @@ Promijenimo i index.html predložak. U njemu ćemo iterirat kroz listu postova i
 </ul>
 
 {% endblock %}
+{% endraw %}
 ```
 
 **Objašnjenje dijelova koda**
@@ -365,6 +367,7 @@ def post_view(post_id):
 
 Kreirajno i novi predložak ```blog_view.html``` koji će prikazati post:
 ```html
+{% raw %}
 {% extends "base.html" %}
 {% block title %}{{post.title}}{% endblock %}
 {% block head %}
@@ -387,6 +390,7 @@ Kreirajno i novi predložak ```blog_view.html``` koji će prikazati post:
         </div>
     </div>
 {% endblock %}
+{% endraw %}
 ```
 
 Na kraju promijenimo u ```index.html``` link na detalje:
