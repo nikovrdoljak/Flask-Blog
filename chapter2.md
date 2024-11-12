@@ -603,6 +603,22 @@ Još preostaje izmijeniti predloške ```index.html``` i ```blog_view.html``` da 
 
 Osvježimo glavnu stranicu ili stranicu posta u kojem smo dodali sliku i provjerimo da se slike prikazuju.
 
+### Markdown podrška
+Slijedeće što želimo jest da možemo formatirati sadržaj posta. Iako je to moguće korištenjem HTML-a u našem scenariju ćemo koristiti **Markdown**, kao što ga koristimo u **README.md** datotekama.
+
+**Markdown (MD)** je jednostavan oblikovni jezik koji omogućava pisanje formatiranog teksta pomoću običnih tekstualnih znakova. Razvio ga je John Gruber 2004. godine s ciljem da olakša pisanje i čitanje formatiranih dokumenata. Markdown je popularan zbog svoje jednostavnosti i lakoće učenja. Koristi osnovne simbole za formatiranje, kao što su # za naslove, * za isticanje teksta, []() za poveznice i ![]() za slike. Primjerice:
+
+```
+## Naslov
+Ovo je **podebljani tekst**, a ovo je *nakošeno*.
+```
+
+Rezultat je:
+```md
+## Naslov
+Ovo je **podebljani tekst**, a ovo je *nakošeno*.
+```
+
 
 
 
