@@ -594,9 +594,11 @@ def serve_image(image_id):
 
 Još preostaje izmijeniti predloške ```index.html``` i ```blog_view.html``` da prikazuju slike. Odmah ispod naslova u oba predloška dodajmo:
 ```html
+        {% raw %}
         {% if post.image_id %}
         <img src="{{ url_for('serve_image', image_id=post.image_id) }}" class="img-fluid" alt="Slika">
         {% endif %}
+        {% endraw %}
 ```
 
 Osvježimo glavnu stranicu ili stranicu posta u kojem smo dodali sliku i provjerimo da se slike prikazuju.
