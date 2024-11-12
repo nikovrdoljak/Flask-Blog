@@ -505,5 +505,104 @@ def delete_post(post_id):
 ```
 Ova ruta dohvaća ID posta iz URL-a, briše odgovarajući zapis iz ```posts_collection``` u MongoDB-u, prikazuje poruku o uspješnom brisanju, te preusmjerava na glavnu stranicu.
 
+Slijede još tri značajke kojimo želimo u našu aplikaciju:
+* dodavanje i prikaz slike posta
+* formatiranje sadržaja posta u Markdown formatu
+* lakše dodavanje tagova (oznaka) posta
+
+### Podrška za slike u postu
+Za spremanje slika u postovima, koristit ćemo također MongoDB. U MongoDB-u, slike se pohranjuju koristeći sustav nazvan **GridFS**. Umjesto da se slika sprema direktno u jedan dokument (što bi moglo premašiti ograničenje MongoDB-a od 16 MB po dokumentu), GridFS omogućava da se velike binarne datoteke, poput slika, pohranjuju u manjim dijelovima kroz više dokumenata.
+Evo kako to funkcionira u našem scenariju:
+* **Razbijanje podataka na dijelove:** Kada se slika učita pomoću GridFS-a, podijeli se na manje dijelove, obično od 255 KB. Ti se dijelovi pohranjuju kao zasebni dokumenti unutar kolekcije ```fs.chunks``` u MongoDB bazi.
+* **Metapodaci u fs.files:** Svaka datoteka pohranjena pomoću GridFS-a ima zapis metapodataka u kolekciji ```fs.files```, koji uključuje naziv datoteke, datum učitavanja, veličinu i jedinstveni ID (_id). Taj ID povezuje metapodatke slike s njenim dijelovima.
+* **Referenciranje slike u dokumentima:** U našoj aplikaciji ćemu prilikom uređivanja posta, sliku se spremiti pomoću GridFS-a s njenim jedinstveni ID (image_id) u dokument posta unutar kolekcije posts. Ovaj ID služi kao referenca za kasnije dohvaćanje slike bez pohranjivanja binarnih podataka direktno u dokument posta.
+* **Dohvaćanje i prikaz slika:** Prilikom prikazivanja slike, koristeći GridFS-ovu metodu get s image_id, dohvatit ćemo podatke slike te ju prikazati pomoću zasebne rute.
+
+Sljedeći koraci su potrebni da bismo imali podršku za slike. Najprije dodajmo u ```app.py```:
+```python
+import gridfs
+
+fs = gridfs.GridFS(db)
+```
+* **gridfs** iz PyMongo biblioteke omogućuje nam pohranu velikih datoteka u MongoDB (većih od 16 MB) razdjeljivanjem na manje dijelove.
+* **fs** je objekt koji koristi GridFS za pohranu datoteka u MongoDB.
+
+Zatim dodajmo metodu koja će pohraniti sliku u MongoDB, te ćemo ju koristiti prilikom spremanja ili ažuriranja posta u pripadnima metodama.
+
+```python
+def save_image_to_gridfs(request, fs):
+    if 'image' in request.files:
+        image = request.files['image']
+        if image.filename != '':
+            image_id = fs.put(image, filename=image.filename)
+        else:
+            image_id = None
+    else:
+        image_id = None
+    return image_id
+```
+
+U ```post_create``` rutu dodajmo dvije linije koda (s image_id) tako da ona sad izgleda:
+```python
+@app.route('/blog/create', methods=["get", "post"])
+def post_create():
+    form = BlogPostForm()
+    if form.validate_on_submit():
+        image_id = save_image_to_gridfs(request, fs)
+        post = {
+            'title': form.title.data,
+            'content': form.content.data,
+            'author': form.author.data,
+            'status': form.status.data,
+            'date': datetime.combine(form.date.data, datetime.min.time()),
+            'tags': form.tags.data,
+            'image_id': image_id,
+            'date_created': datetime.utcnow()
+        }
+        posts_collection.insert_one(post)
+        flash('Post je uspješno upisan.', 'success')
+        return redirect(url_for('index'))
+    return render_template('blog_edit.html', form=form)
+```
+
+Slično dodajmo i u ```post_edit``` rutu, odmah ispod ```posts_collection.update_one()```:
+```python
+        image_id = save_image_to_gridfs(request, fs)
+        if image_id != None:
+            posts_collection.update_one(
+            {"_id": ObjectId(post_id)},
+            {"$set": {
+                'image_id': image_id,
+            }}
+        )
+```
+
+Ako sam dodamo ili uredimo neki post, te prenesemo sliku, on će biti spremljena u MongoDB bazu. Ako osvježimo bazu u Compassu, vidjet ćemo dvije nove kolekcije: **fs.files** i **fs.chunks**.
+
+Slijedeći korak je prikaz slike u postu. Najprije dodajmo novu rutu za prikaz slike:
+```python
+@app.route('/image/<image_id>')
+def serve_image(image_id):
+    image = fs.get(ObjectId(image_id))
+    return image.read(), 200, {'Content-Type': 'image/jpeg'}
+```
+**Objašnjenje:**
+* Kad preglednik zatraži ```/image/<image_id>```, funkcija ```serve_image``` poziva se s ```image_id``` kao parametrom (ID slike u GridFS).
+* ```fs.get(ObjectId(image_id))``` konvertira image_id u MongoDB ObjectId format, a fs.get() dohvaća sliku iz GridFS pomoću tog ID-a.
+* ```image.read()``` čita podatke slike, a 200 označava HTTP status "OK".
+* ```{'Content-Type': 'image/jpeg'}``` postavlja Content-Type header na image/jpeg, tako da preglednik zna da je u pitanju slika.
+
+Još preostaje izmijeniti predloške ```index.html``` i ```blog_view.html``` da prikazuju slike. Odmah ispod naslova u oba predloška dodajmo:
+```html
+        {% if post.image_id %}
+        <img src="{{ url_for('serve_image', image_id=post.image_id) }}" class="img-fluid" alt="Slika">
+        {% endif %}
+```
+
+Osvježimo glavnu stranicu ili stranicu posta u kojem smo dodali sliku i provjerimo da se slike prikazuju.
+
+
+
+
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
 
