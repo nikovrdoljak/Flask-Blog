@@ -696,18 +696,57 @@ var easyMDE = new EasyMDE({ element: document.getElementById('markdown-editor') 
 {% endraw %}
 ```
 
-U klasi ```BlogPostForm``` promijenimo ```content```:
+U klasi ```BlogPostForm``` promijenimo ```content``` svojstvo:
 ```python
     content = TextAreaField('Sadržaj', render_kw={"id": "markdown-editor"})
 ```
 Atribut ```render_kw``` omogućuje dodavanje dodatnih HTML atributa u formu koja se generira iz polja. Ovim dodajemo HTML id atribut s vrijednošću ("markdown-editor"), što omogućava integraciju s EasyMDE editorom.
 
-Detaljnije o korištenju EasyMDE možete pronači na [https://github.com/Ionaru/easy-markdown-editor](https://github.com/Ionaru/easy-markdown-editor).
-
 Ako sad učitamo stranicu za uređivanje posta, vidjet ćemo da editor polje za uređivanje sadržaja izgleda ljepše:
 ![Markdown EasyMDE editor](assets/images/easymde.png)
 
+Detaljnije o korištenju EasyMDE možete pronači na [https://github.com/Ionaru/easy-markdown-editor](https://github.com/Ionaru/easy-markdown-editor).
 
+
+### Oznake (tagovi) i Choices.js
+Posljednja stvar koju ćemo poboljšati je uređivanje oznaka (tagova) u postu. U tu svrhu ćemo korisiti JavaScript biblioteku **Choices.js**.
+
+Choices.js je JavaScript biblioteka koja poboljšava HTML <select> i <input> elemente pružajući namkorisniku mogućnost odabira ili dodavanja više stavki, poput oznaka, te je vrlo korisna kada uređujete post s oznaka, jer omogućuje intuitivno dodavanje, uređivanje i uklanjanje istih kroz jednostavno korisničko sučelje.
+
+Dodajmo i podršku za Choices.js u **blog_edit.html** predlošku, na sličan način kao u prethodnoj sekciji odmah ispod EasyMDE:
+```html
+<!-- Uključi Choices.js CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
+...
+
+<!-- Uključi i inicijaliziraj Choices.js JS -->
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+    const tagsInput = document.getElementById('tags');
+    const choices = new Choices(tagsInput, {
+        delimiter: ',',
+        editItems: true,
+        maxItemCount: 5,
+        removeItemButton: true,
+        duplicateItemsAllowed: false
+    });
+</script>
+```
+
+U klasi ```BlogPostForm``` promijenimo ```tags``` svojstvo:
+```python
+    tags = StringField('Oznake', render_kw={"id": "tags"})
+```
+
+Ako sad učitamo stranicu za uređivanje posta, vidjet ćemo da kako izgleda uređivanje oznaka:
+![Choices.js](assets/images/choices.js.png)
+
+Detaljnije o korištenju Choices.js možete pronači na [https://github.com/Choices-js/Choices](https://github.com/Choices-js/Choices).
+
+Ovime smo završili poglavlje o spremanju, uređivanju i dohvatu podataka (postova) iz MongoDB baze podataka.
+
+U sljedećem poglavlju upoznat ćemo se s autentikacijom u Flasku.
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
 
