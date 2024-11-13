@@ -4,11 +4,11 @@
 
 
 # Uvod u baze podataka i njihovu primjenu u aplikacijama
-U ovom poglavlju specificirat ćemo zahtjeve naše aplikacije za upravljanje blog postovima, te započeti s njenom implementacijom. No prije toga ćemo ukratko predstaviti koncept baze podataka, koju ćemo koristiti za spremanje postova i ostalih entiteta naše aplikacije. 
+U ovom poglavlju specificirat ćemo zahtjeve naše aplikacije za upravljanje blog člancima, te započeti s njenom implementacijom. No prije toga ćemo ukratko predstaviti koncept baze podataka, koju ćemo koristiti za spremanje članaka i ostalih entiteta naše aplikacije. 
 
-Baze podataka su ključne za pohranjivanje podataka koje aplikacija koristi i obrađuje, poput korisničkih informacija, sadržaja i drugih vrsta podataka. One omogućuju trajno spremanje podataka, pristup njima, pretragu, ažuriranje i brisanje na strukturiran način. Umjesto pohranjivanja podataka u privremenu memoriju ili datoteke, baze podataka omogućuju rad s velikim količinama podataka na učinkovit i siguran način, čuvajući integritet podataka.
+**Baze podataka** su ključne za pohranjivanje podataka koje aplikacija koristi i obrađuje, poput korisničkih informacija, sadržaja i drugih vrsta podataka. One omogućuju trajno spremanje podataka, pristup njima, pretragu, ažuriranje i brisanje na strukturiran način. Umjesto pohranjivanja podataka u privremenu memoriju ili datoteke, baze podataka omogućuju rad s velikim količinama podataka na učinkovit i siguran način, čuvajući integritet podataka.
 
-U aplikacijama poput bloga (koju ćemo mi raditi), baza podataka omogućuje spremanje članaka, komentara, korisničkih informacija i drugih elemenata potrebnih za funkcionalnost bloga. Korištenjem baze podataka, možemo jednostavno dohvatiti, filtrirati i prikazati postove.
+U aplikacijama poput bloga (koju ćemo mi raditi), baza podataka omogućuje spremanje članaka, komentara, korisničkih informacija i drugih elemenata potrebnih za funkcionalnost bloga. Korištenjem baze podataka, možemo jednostavno dohvatiti, filtrirati i prikazati članke.
 
 ## MongoDB – NoSQL baza podataka
 **MongoDB** je NoSQL baza podataka, što znači da podaci nisu pohranjeni u tabličnom obliku kao u klasičnim relacijskim bazama podataka (npr. MySQL). Umjesto toga, MongoDB koristi JSON-slične dokumente (u BSON formatu) za pohranu podataka, što omogućava fleksibilnije modeliranje podataka. Ovaj pristup je prikladan za aplikacije u kojima se podaci često mijenjaju ili imaju različite strukture.
@@ -17,7 +17,7 @@ MongoDB je popularan zbog:
 * Fleksibilnosti – Dokumenti u bazi mogu imati različite strukture.
 * Skalabilnosti – Podržava horizontalno skaliranje.
 * Jednostavne integracije – MongoDB se lako integrira s različitim programskim jezicima, uključujući Python, što ga čini idealnim za Flask aplikacije.
-U našoj blog aplikaciji, svaki blog post možemo pohraniti kao dokument s ključevima kao što su naslov, sadržaj, autor i datum.
+U našoj blog aplikaciji, svaki blog članak možemo pohraniti kao dokument s ključevima kao što su naslov, sadržaj, autor i datum.
 
 ## Instalacija MongoDB-a na lokalni uređaj
 Da biste koristili MongoDB lokalno, slijedite ove korake:
@@ -48,31 +48,31 @@ mongod --dbpath /putanja/do/vašeg/db/foldera
 * Preporučljivo je stvoriti poseban direktorij gdje će MongoDB pohranjivati podatke.
 * Povezivanje s MongoDB-om: Nakon instalacije, MongoDB će raditi na localhostu, portu 27017. Koristit ćemo ga našoj u Flask aplikaciji pomoću Pythona i biblioteke kao što je pymongo.
 
-U sljedećem koraku, integrirat ćemo MongoDB s Flask aplikacijom za spremanje i dohvaćanje blog postova.
+U sljedećem koraku, integrirat ćemo MongoDB s Flask aplikacijom za spremanje i dohvaćanje blog članaka.
 
 ## Specifikacija Blog aplikacije
 
-Aplikacija će koristiti Flask, Bootstrap-Flask za stilizaciju, Flask-WTF za obradu formi i MongoDB kao bazu podataka za pohranu podataka o postovima. U ovom poglavlju naš cilj je stvoriti jednostavnu, ali funkcionalnu aplikaciju koja omogućava korisnicima kreiranje, uređivanje, brisanje i pregled blog postova.
+Aplikacija će koristiti Flask, Bootstrap-Flask za stilizaciju, Flask-WTF za obradu formi i MongoDB kao bazu podataka za pohranu podataka o člancima. U ovom poglavlju naš cilj je stvoriti jednostavnu, ali funkcionalnu aplikaciju koja omogućava korisnicima kreiranje, uređivanje, brisanje i pregled blog članaka.
 
 ### Glavne funkcionalnosti aplikacije:
-* **Lista postova**: Korisnici će moći pregledavati sve blog postove na jednoj stranici. Svaki post će sadržavati naslov, sažetak i osnovne informacije poput autora i datuma.
-* **Pregled pojedinačnih postova**: Klikom na post, korisnici će biti preusmjereni na stranicu koja prikazuje puni sadržaj postа, uključujući slike i tagove.
-* **Kreiranje postova**: Aplikacija će omogućiti autorima da kreiraju nove postove putem forme. Ova forma će uključivati potrebna polja kao što su naslov, sadržaj, autor, datum, tagove i slika.
-* **Uređivanje postova**: Autori će moći uređivati postojeće postove. To će uključivati ponovno prikazivanje forme s prethodno unesenim podacima, omogućujući autorima da izvrše izmjene.
-* **Brisanje postova**: Korisnici će moći brisati postove, čime će se trajno ukloniti podaci iz baze.
+* **Lista članaka**: Korisnici će moći pregledavati sve blog članke na jednoj stranici. Svaki post će sadržavati naslov, sažetak i osnovne informacije poput autora i datuma.
+* **Pregled pojedinačnih članaka**: Klikom na post, korisnici će biti preusmjereni na stranicu koja prikazuje puni sadržaj članka, uključujući slike i tagove.
+* **Kreiranje članaka**: Aplikacija će omogućiti autorima da kreiraju nove članke putem forme. Ova forma će uključivati potrebna polja kao što su naslov, sadržaj, autor, datum, tagove i slika.
+* **Uređivanje članaka**: Autori će moći uređivati postojeće članke. To će uključivati ponovno prikazivanje forme s prethodno unesenim podacima, omogućujući autorima da izvrše izmjene.
+* **Brisanje članaka**: Korisnici će moći brisati članke, čime će se trajno ukloniti podaci iz baze.
 
 ### Struktura modela podataka
-Svaki blog post će imati sljedeće atribute:
-* Naslov (title): Kratak opis postа koji će biti prikazan na listi postova.
-* Sadržaj (content): Glavni tekst postа.
+Svaki blog članak će imati sljedeće atribute:
+* Naslov (title): Kratak opis članka koji će biti prikazan na listi članaka.
+* Sadržaj (content): Glavni tekst članka.
 * Autor (author): Ime osobe koja je napisala post.
-* Datum (date): Datum kada je post kreiran.
-* Tagovi (tags): Kategorije ili ključne riječi povezane s postom, omogućujući korisnicima lakše pretraživanje.
-* Slika (image): veza prema slici koja će biti prikazana u postu.
+* Datum (date): Datum kada je članak kreiran.
+* Tagovi (tags): Kategorije ili ključne riječi povezane s člankom, omogućujući korisnicima lakše pretraživanje.
+* Slika (image): veza prema slici koja će biti prikazana u članku.
 
 ## Implementacija Blog aplikacije
 
-Da bismo započeli s implementacijom aplikacije za upravljanje blog postovima, prvo ćemo kreirati klasu BlogPostForm koja će koristiti Flask-WTF za obradu formi, zatim ćemo implementirati rutu za kreiranje novog posta i pohraniti post u MongoDB. Evo koraka koje trebate slijediti:
+Da bismo započeli s implementacijom aplikacije za upravljanje blog člancima, prvo ćemo kreirati klasu BlogPostForm koja će koristiti Flask-WTF za obradu formi, zatim ćemo implementirati rutu za kreiranje novog posta i pohraniti članak u MongoDB. Evo koraka koje trebate slijediti:
 
 ### Instalacija pymongo
 Prije nego što počnemo raditi s MongoDB-om u našoj Flask aplikaciji, trebamo instalirati biblioteku pymongo, koja omogućava povezivanje Flask aplikacije s MongoDB-om. Za instalaciju pokrenite naredbu u terminalu:
@@ -106,12 +106,12 @@ Ova linija pristupa bazi podataka unutar MongoDB-a s imenom ```pzw_blog_database
 posts_collection = db['posts']
 ```
 
-Ovdje definiramo kolekciju unutar baze podataka nazvanu ```posts```. Kolekcija je slična tablici u SQL bazama podataka i koristi se za pohranu više dokumenata (redaka) s podacima o blog postovima. MongoDB koristi JSON-sličan format pod nazivom BSON (Binary JSON) za pohranu podataka, što ga čini prikladnim za pohranu nestrukturiranih podataka poput blog postova.
+Ovdje definiramo kolekciju unutar baze podataka nazvanu ```posts```. Kolekcija je slična tablici u SQL bazama podataka i koristi se za pohranu više dokumenata (redaka) s podacima o blog člancima. MongoDB koristi JSON-sličan format pod nazivom BSON (Binary JSON) za pohranu podataka, što ga čini prikladnim za pohranu nestrukturiranih podataka poput blog članaka.
 
 Dakle, ovaj kod omogućuje aplikaciji da:
 * Pristupi MongoDB serveru na lokalnom računalu.
 * Radi s bazom podataka ```pzw_blog_database```.
-* Pristupi kolekciji ```posts```, gdje će se pohranjivati i preuzimati podaci o postovima bloga.
+* Pristupi kolekciji ```posts```, gdje će se pohranjivati i preuzimati podaci o člancima bloga.
 
 
 ### Kreiranje BlogPostForm klase
@@ -140,8 +140,8 @@ Ova klasa definirana je na način sličan klasi NameForm iz prethodnog poglavlja
 * Polje content je TextAreaField, namijenjeno za unos duljeg teksta (sadržaja blog posta). Nema dodanih validatora, pa je unos u ovo polje opcionalan.
     * Kasnije ćemo dodati mogućnost unosa sadržaja u MD Markup formatu.
 * Polje date je DateField koje koristi trenutni datum kao zadanu vrijednost putem datetime.today.
-* Polje status je RadioField, koje omogućuje korisniku da odabere između dvije opcije: draft (Skica) i published (Objavljeno). Zadana vrijednost je draft, što znači da će svaki post biti spremljen kao skica osim ako korisnik ne odabere objavljivanje.
-* Polje tags je StringField za unos oznaka povezanih s postom. Oznake se mogu koristiti za kategorizaciju ili pretraživanje sadržaja, a unos je opcionalan. 
+* Polje status je RadioField, koje omogućuje korisniku da odabere između dvije opcije: draft (Skica) i published (Objavljeno). Zadana vrijednost je draft, što znači da će svaki članak biti spremljen kao skica osim ako korisnik ne odabere objavljivanje.
+* Polje tags je StringField za unos oznaka povezanih s člankom. Oznake se mogu koristiti za kategorizaciju ili pretraživanje sadržaja, a unos je opcionalan. 
 * Polje image je FileField koje omogućuje korisniku dodavanje slike uz post. Koristi validator FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!') koji dopušta samo određene tipove datoteka (JPEG i PNG slike). Ako korisnik pokuša dodati datoteku drugog tipa, prikazat će se poruka "Samo slike!".
     * Podršku za unos slika ćemo dodati kasnije.
 
@@ -163,14 +163,14 @@ def post_create():
             'date_created': datetime.utcnow()
         }
         posts_collection.insert_one(post)
-        flash('Post je uspješno upisan.', 'success')
+        flash('Članak je uspješno upisan.', 'success')
         return redirect(url_for('index'))
     return render_template('blog_edit.html', form=form)
 ```
 
 Ova ruta izgleda slično onoj iz prethodnog poglavlja. Nakon validacije, svi uneseni podaci iz obrasca dohvaćaju se pomoću ```.data``` atributa i pohranjuju u novi rječnik ```post```. 
 
-Dalje se koristi ```insert_one()``` metoda iz pymongo biblioteke kako bi se novi post pohranio u MongoDB kolekciju pod nazivom ```posts_collection```. Svaki put kad korisnik pošalje novu obrazac, stvara se novi dokument u bazi. Metoda ```flash()``` prikazuje poruku korisniku nakon uspješnog unosa, te se preusmejravamo na rutu ```index()```.
+Dalje se koristi ```insert_one()``` metoda iz pymongo biblioteke kako bi se novi članak pohranio u MongoDB kolekciju pod nazivom ```posts_collection```. Svaki put kad korisnik pošalje novu obrazac, stvara se novi dokument u bazi. Metoda ```flash()``` prikazuje poruku korisniku nakon uspješnog unosa, te se preusmejravamo na rutu ```index()```.
 
 Ako obrazac nije poslan ili ako ima pogreške u unosu, prikazuje se ```blog_edit.html``` predložak s formom obrascem kako bi korisnik mogao vidjeti obrazac ili ispraviti eventualne greške. Stoga kreirajmo taj novi predložak.
 
@@ -228,11 +228,11 @@ Ako ste sve uspješno odradili, nova verzija aplikacije će imati navigacijsku t
 
 ![Novi post](assets/images/create_post.png)
 
-Ovim koracima omogućili smo unos podataka za novi blog post putem forme i pohranu tih podataka u MongoDB unutar kolekcije posts_collection. U daljnjim koracima proširit ćemo funkcionalnost kako bismo omogućili prikaz, uređivanje i brisanje blog postova.
+Ovim koracima omogućili smo unos podataka za novi blog članak putem forme i pohranu tih podataka u MongoDB unutar kolekcije posts_collection. U daljnjim koracima proširit ćemo funkcionalnost kako bismo omogućili prikaz, uređivanje i brisanje blog članaka.
 
-### Provjera sadržaja kolekcije postova u bazi
+### Provjera sadržaja kolekcije članaka u bazi
 
-Da bismo vidjeli spremljeni blog post u MongoDB koristimo **MongoDB Compass**. Slijedite ove korake:
+Da bismo vidjeli spremljeni blog članak u MongoDB koristimo **MongoDB Compass**. Slijedite ove korake:
 
 1. Pokretanje MongoDB Compass: Otvorite MongoDB Compass aplikaciju na svom računalu. MongoDB Compass omogućava vizualno istraživanje i upravljanje podacima pohranjenim u MongoDB bazi.
 
@@ -243,9 +243,9 @@ Da bismo vidjeli spremljeni blog post u MongoDB koristimo **MongoDB Compass**. S
 3. Pristupanje bazi i kolekciji:
     * Nakon uspješnog povezivanja, u lijevom izborniku vidjet ćete popis baza podataka. Pronađite svoju bazu, u ovom slučaju, ```pzw_blog_database```.
     * Kliknite na bazu kako biste otvorili popis kolekcija, zatim odaberite kolekciju ```posts```.
-4. Pregled Postova:
+4. Pregled članaka:
     * Unutar kolekcije "posts" možete vidjeti sve spremljene dokumente. Ovdje će biti prikazani svi blog postovi koje ste pohranili, svaki kao pojedinačan dokument.
-    * Prvi blog post koji ste unijeli putem aplikacije trebao bi biti vidljiv ovdje. Moći ćete pregledati polja kao što su ```title```, ```content```, ```author```, ```date```, i ```tags```.
+    * Prvi blog članak koji ste unijeli putem aplikacije trebao bi biti vidljiv ovdje. Moći ćete pregledati polja kao što su ```title```, ```content```, ```author```, ```date```, i ```tags```.
 5. Pregledavanje i uređivanje:
     * Možete kliknuti na svaki dokument kako biste vidjeli detalje. Također, MongoDB Compass nudi opcije za uređivanje, brisanje ili dodavanje novih dokumenata ako želite pokazati dodatne funkcionalnosti studentima.
 6. Dodatne Opcije:
@@ -263,7 +263,7 @@ Osim u Mongo Compass, spremljene podatke iz MongoDB baze možmo pregledati i kor
 ```bash
 use pzw_blog_database
 ```
-3. Pregled postova u kolekciji: Da biste dohvatili sve blog postove spremljene u kolekciji posts, upišite:
+3. Pregled članaka u kolekciji: Da biste dohvatili sve blog članke spremljene u kolekciji posts, upišite:
 ```js
 db.posts.find()
 ```
@@ -292,23 +292,23 @@ pzw_blog_database> db.posts.find()
 
 Sami odaberite koju aplikaciju ćete koristiti za rad s MongoDB-om: Compass ili Shell.
 
-### Prikaz postova na glavnoj stranici
+### Prikaz članaka na glavnoj stranici
 
-Za prikazivanje blog postova s statusom "published" u početnoj (index) ruti, prvo ćemo dohvatiti sve postove iz MongoDB-a koji imaju status "published". Zatim ćemo ih prikazati u izmijenjenom Jinja predlošku.
+Za prikazivanje blog članaka s statusom "published" u početnoj (index) ruti, prvo ćemo dohvatiti sve članke iz MongoDB-a koji imaju status "published". Zatim ćemo ih prikazati u izmijenjenom Jinja predlošku.
 
 Prvo, trebamo prilagoditi rutu i dohvatiti podatke iz baze podataka. Zatim ćemo izmijeniti predložak za prikaz tih podataka.
 
 **Ažuriranje rute**
-Ažurirajmo index rutu da dohvaća samo objavljene postove iz kolekcije ```posts_collection```. Izbrišimo što smo u njoj do sad imali i stavimo:
+Ažurirajmo index rutu da dohvaća samo objavljene članke iz kolekcije ```posts_collection```. Izbrišimo što smo u njoj do sad imali i stavimo:
 ```python
 @app.route("/", methods=["GET", "POST"])
 def index():
     published_posts = posts_collection.find({"status": "published"}).sort('date', -1)
     return render_template('index.html', posts = published_posts)
 ```
-Ovdje koristimo ```posts_collection.find({"status": "published"}).sort('date', -1)``` kako bismo dohvatili samo postove s statusom "published". ```sort('date', -1)```  metoda sortira postove prema polju ```date```. Argument -1 označava opadajući redoslijed (najnoviji postovi se nalaze na vrhu). Ako želite rastući redoslijed, koristit ćete 1 umjesto -1.
+Ovdje koristimo ```posts_collection.find({"status": "published"}).sort('date', -1)``` kako bismo dohvatili samo članke s statusom "published". ```sort('date', -1)```  metoda sortira članke prema polju ```date```. Argument -1 označava opadajući redoslijed (najnoviji postovi se nalaze na vrhu). Ako želite rastući redoslijed, koristit ćete 1 umjesto -1.
 
-Promijenimo i index.html predložak. U njemu ćemo iterirat kroz listu postova i prikazati podatke poput naslova, autora, datuma, oznaka i sadržaja. Poveznicu na detalje posta (koju ćemo implementirati kasnije) postavit ćemo na naslovu.
+Promijenimo i index.html predložak. U njemu ćemo iterirat kroz listu članaka i prikazati podatke poput naslova, autora, datuma, oznaka i sadržaja. Poveznicu na detalje posta (koju ćemo implementirati kasnije) postavit ćemo na naslovu.
 
 ```html
 {% raw %}
@@ -347,9 +347,9 @@ Promijenimo i index.html predložak. U njemu ćemo iterirat kroz listu postova i
 * Razdvajamo oznake po zarezima ```split(',')``` funkcijom, a ```badge bg-primary``` daje oznakama izgled male značke s plavom bojom.
 
 ### Prikaz pojedinačnog posta
-Implementirat ćemo rutu ```/blog/<post_id>``` koja će prikazivati detalje posta, te omogućiti uređivanje i brisanje postova, pa nastavimo.
+Implementirat ćemo rutu ```/blog/<post_id>``` koja će prikazivati detalje posta, te omogućiti uređivanje i brisanje članaka, pa nastavimo.
 
-Prvo ćemo definirati rutu koja će dohvatiti post pomoću ```post_id```, a zatim prikazati njegov sadržaj u novom predlošku ```blog_edit.html```.
+Prvo ćemo definirati rutu koja će dohvatiti članak pomoću ```post_id```, a zatim prikazati njegov sadržaj u novom predlošku ```blog_edit.html```.
 
 ```python
 from bson.objectid import ObjectId
@@ -359,7 +359,7 @@ def post_view(post_id):
     post = posts_collection.find_one({'_id': ObjectId(post_id)})
 
     if not post:
-        flash("Post nije pronađen!", "danger")
+        flash("Članak nije pronađen!", "danger")
         return redirect(url_for('index'))
 
     return render_template('blog_view.html', post=post)
@@ -398,7 +398,7 @@ Na kraju promijenimo u ```index.html``` link na detalje:
 <h2><a href="{{ url_for('view_post', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>
 ```
 
-Ako sad kliknemo na naslov posta na glavnom stranici, otvorit će se stranica samo s tim postom. 
+Ako sad kliknemo na naslov posta na glavnom stranici, otvorit će se stranica samo s tim člankom. 
 
 Na dnu posta smo dodali i dva gumba koje ćemo koristiti za uređivanje i brisanje posta, pa krenimo i s tim dijelom.
 
@@ -435,7 +435,7 @@ def post_edit(post_id):
                 'date_updated': datetime.utcnow()
             }}
         )
-        flash('Post je uspješno ažuriran.', 'success')
+        flash('Članak je uspješno ažuriran.', 'success')
         return redirect(url_for('post_view', post_id = post_id))
     else:
         flash('Dogodila se greška!', category='warning')
@@ -458,7 +458,7 @@ Koristit čemo Bootstrap komponentu [Modal](https://getbootstrap.com/docs/5.3/co
                 Briši
             </button>
 ```
-Ukratko, ovdje koristimo ```data-bs-toggle``` za povezivanje s modalom prozorom (```#deleteModal```) i ```data-postid``` za prosljeđivanje ID-a posta JavaScript kod, kojeg ćemo proslijediti kao post za brisanje.
+Ukratko, ovdje koristimo ```data-bs-toggle``` za povezivanje s modalom prozorom (```#deleteModal```) i ```data-postid``` za prosljeđivanje ID-a posta JavaScript kod, kojeg ćemo proslijediti kao članak za brisanje.
 
 Nadalje za korištenje *Modal* komponente, treba nam dodatak HTML i JavaScript kod. Dodajmo ga na kraj ```blog_view.html``` predloška:
 
@@ -500,7 +500,7 @@ Još moramo dodati i Flask rutu za brisanje:
 @app.route('/blog/delete/<post_id>', methods=['POST'])
 def delete_post(post_id):
     posts_collection.delete_one({"_id": ObjectId(post_id)})
-    flash('Post je uspješno obrisan.', 'success')
+    flash('Članak je uspješno obrisan.', 'success')
     return redirect(url_for('index'))
 ```
 Ova ruta dohvaća ID posta iz URL-a, briše odgovarajući zapis iz ```posts_collection``` u MongoDB-u, prikazuje poruku o uspješnom brisanju, te preusmjerava na glavnu stranicu.
@@ -510,8 +510,8 @@ Slijede još tri značajke kojimo želimo u našu aplikaciju:
 * formatiranje sadržaja posta u Markdown formatu
 * lakše dodavanje tagova (oznaka) posta
 
-### Podrška za slike u postu
-Za spremanje slika u postovima, koristit ćemo također MongoDB. U MongoDB-u, slike se pohranjuju koristeći sustav nazvan **GridFS**. Umjesto da se slika sprema direktno u jedan dokument (što bi moglo premašiti ograničenje MongoDB-a od 16 MB po dokumentu), GridFS omogućava da se velike binarne datoteke, poput slika, pohranjuju u manjim dijelovima kroz više dokumenata.
+### Podrška za slike u članku
+Za spremanje slika u člancima, koristit ćemo također MongoDB. U MongoDB-u, slike se pohranjuju koristeći sustav nazvan **GridFS**. Umjesto da se slika sprema direktno u jedan dokument (što bi moglo premašiti ograničenje MongoDB-a od 16 MB po dokumentu), GridFS omogućava da se velike binarne datoteke, poput slika, pohranjuju u manjim dijelovima kroz više dokumenata.
 Evo kako to funkcionira u našem scenariju:
 * **Razbijanje podataka na dijelove:** Kada se slika učita pomoću GridFS-a, podijeli se na manje dijelove, obično od 255 KB. Ti se dijelovi pohranjuju kao zasebni dokumenti unutar kolekcije ```fs.chunks``` u MongoDB bazi.
 * **Metapodaci u fs.files:** Svaka datoteka pohranjena pomoću GridFS-a ima zapis metapodataka u kolekciji ```fs.files```, koji uključuje naziv datoteke, datum učitavanja, veličinu i jedinstveni ID (_id). Taj ID povezuje metapodatke slike s njenim dijelovima.
@@ -560,7 +560,7 @@ def post_create():
             'date_created': datetime.utcnow()
         }
         posts_collection.insert_one(post)
-        flash('Post je uspješno upisan.', 'success')
+        flash('Članak je uspješno upisan.', 'success')
         return redirect(url_for('index'))
     return render_template('blog_edit.html', form=form)
 ```
@@ -579,7 +579,7 @@ Slično dodajmo i u ```post_edit``` rutu, odmah ispod ```posts_collection.update
 
 Ako sam dodamo ili uredimo neki post, te prenesemo sliku, on će biti spremljena u MongoDB bazu. Ako osvježimo bazu u Compassu, vidjet ćemo dvije nove kolekcije: **fs.files** i **fs.chunks**.
 
-Slijedeći korak je prikaz slike u postu. Najprije dodajmo novu rutu za prikaz slike:
+Slijedeći korak je prikaz slike u članku. Najprije dodajmo novu rutu za prikaz slike:
 ```python
 @app.route('/image/<image_id>')
 def serve_image(image_id):
@@ -658,7 +658,7 @@ U predlošcima index.html i blog_view.html primijenimo filter:
 ```
 {{ post.content | markdown | safe }}
 ```
-Izmijenimo neki post i pogledajmo rezultate.
+Izmijenimo neki članak i pogledajmo rezultate.
 
 ### Mardown editor (EasyMDE)
 Sljedeći korak će nam biti da omogućimo uređivanje markdown sadržaja u editoru namjenjenom za takve prilike. U tu svrhu ćemo dodati podršku za EasyMDE editor.
@@ -709,9 +709,9 @@ Detaljnije o korištenju EasyMDE možete pronači na [https://github.com/Ionaru/
 
 
 ### Oznake (tagovi) i Choices.js
-Posljednja stvar koju ćemo poboljšati je uređivanje oznaka (tagova) u postu. U tu svrhu ćemo korisiti JavaScript biblioteku **Choices.js**.
+Posljednja stvar koju ćemo poboljšati je uređivanje oznaka (tagova) u članku. U tu svrhu ćemo korisiti JavaScript biblioteku **Choices.js**.
 
-Choices.js je JavaScript biblioteka koja poboljšava HTML <select> i <input> elemente pružajući namkorisniku mogućnost odabira ili dodavanja više stavki, poput oznaka, te je vrlo korisna kada uređujete post s oznaka, jer omogućuje intuitivno dodavanje, uređivanje i uklanjanje istih kroz jednostavno korisničko sučelje.
+Choices.js je JavaScript biblioteka koja poboljšava HTML <select> i <input> elemente pružajući namkorisniku mogućnost odabira ili dodavanja više stavki, poput oznaka, te je vrlo korisna kada uređujete članak s oznakama, jer omogućuje intuitivno dodavanje, uređivanje i uklanjanje istih kroz jednostavno korisničko sučelje.
 
 Dodajmo i podršku za Choices.js u **blog_edit.html** predlošku, na sličan način kao u prethodnoj sekciji odmah ispod EasyMDE:
 ```html
@@ -740,11 +740,12 @@ U klasi ```BlogPostForm``` promijenimo ```tags``` svojstvo:
 ```
 
 Ako sad učitamo stranicu za uređivanje posta, vidjet ćemo da kako izgleda uređivanje oznaka:
+
 ![Choices.js](assets/images/choices.js.png)
 
 Detaljnije o korištenju Choices.js možete pronači na [https://github.com/Choices-js/Choices](https://github.com/Choices-js/Choices).
 
-Ovime smo završili poglavlje o spremanju, uređivanju i dohvatu podataka (postova) iz MongoDB baze podataka.
+Ovime smo završili poglavlje o spremanju, uređivanju i dohvatu podataka (članaka) iz MongoDB baze podataka.
 
 U sljedećem poglavlju upoznat ćemo se s autentikacijom u Flasku.
 
