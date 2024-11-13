@@ -707,5 +707,7 @@ Detaljnije o korištenju EasyMDE možete pronači na [https://github.com/Ionaru/
 Ako sad učitamo stranicu za uređivanje posta, vidjet ćemo da editor polje za uređivanje sadržaja izgleda ljepše:
 ![Markdown EasyMDE editor](assets/images/easymde.png)
 
+
+
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
 
