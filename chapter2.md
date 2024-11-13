@@ -19,19 +19,19 @@ MongoDB je popularan zbog:
 * Jednostavne integracije – MongoDB se lako integrira s različitim programskim jezicima, uključujući Python, što ga čini idealnim za Flask aplikacije.
 U našoj blog aplikaciji, svaki blog članak možemo pohraniti kao dokument s ključevima kao što su naslov, sadržaj, autor i datum.
 
-## Instalacija MongoDB-a na lokalni uređaj
+## Instalacija MongoDB-a na lokalno računalo
 Da biste koristili MongoDB lokalno, slijedite ove korake:
 
 **Preuzimanje**: Idite na službenu MongoDB stranicu za preuzimanje i preuzmite MongoDB Community Server za vaš operativni sustav:
-* https://www.mongodb.com/try/download/community (MongoDB Community Server - s njim ide i Compass)
+* [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community) (MongoDB Community Server - s njim ide i Compass)
 * Opcionalno:
-    * https://www.mongodb.com/try/download/compass (MongoDB Compass)
-    * https://www.mongodb.com/try/download/shell (MongoDB Shell)
+    * [https://www.mongodb.com/try/download/compass](https://www.mongodb.com/try/download/compass) (MongoDB Compass)
+    * [https://www.mongodb.com/try/download/shell](https://www.mongodb.com/try/download/shell) (MongoDB Shell)
 
 
 ### Instalacija:
 
-* **Windows**: Pokrenite instalacijski program (.msi datoteku) i slijedite upute. Preporučuje se uključivanje opcije Install MongoDB as a Service kako bi MongoDB bio automatski pokrenut prilikom podizanja sustava.
+* **Windows**: Pokrenite instalacijski program (.msi datoteku) i slijedite upute. Preporučuje se uključivanje opcije *Install MongoDB as a Service* kako bi MongoDB bio automatski pokrenut prilikom podizanja sustava.
 * **macOS**: Koristite Homebrew za instalaciju:
 ```bash
 brew tap mongodb/brew
@@ -40,55 +40,56 @@ brew install mongodb-community
 * **Linux**: Instalacija varira ovisno o distribuciji, ali obično uključuje dodavanje MongoDB repozitorija, ažuriranje popisa paketa, i instaliranje pomoću paketa mongodb-org.
 
 ### Pokretanje MongoDB-a:
-* Na Windowsu, MongoDB servis će automatski započeti (ako ste ga uključili prilikom instalacije).
+* Na Windowsu, MongoDB servis će se automatski pokrenuti (ako ste ga uključili prilikom instalacije).
 * Na macOS i Linux sustavima možete pokrenuti MongoDB naredbom:
 ```bash
 mongod --dbpath /putanja/do/vašeg/db/foldera
 ```
 * Preporučljivo je stvoriti poseban direktorij gdje će MongoDB pohranjivati podatke.
-* Povezivanje s MongoDB-om: Nakon instalacije, MongoDB će raditi na localhostu, portu 27017. Koristit ćemo ga našoj u Flask aplikaciji pomoću Pythona i biblioteke kao što je pymongo.
+* Povezivanje s MongoDB-om: Nakon instalacije, MongoDB će raditi na localhostu, portu **27017**. Koristit ćemo ga našoj u Flask aplikaciji pomoću Pythona i biblioteke **pymongo**.
 
 U sljedećem koraku, integrirat ćemo MongoDB s Flask aplikacijom za spremanje i dohvaćanje blog članaka.
 
 ## Specifikacija Blog aplikacije
 
-Aplikacija će koristiti Flask, Bootstrap-Flask za stilizaciju, Flask-WTF za obradu formi i MongoDB kao bazu podataka za pohranu podataka o člancima. U ovom poglavlju naš cilj je stvoriti jednostavnu, ali funkcionalnu aplikaciju koja omogućava korisnicima kreiranje, uređivanje, brisanje i pregled blog članaka.
+Aplikacija će koristiti Flask, Bootstrap-Flask za stilizaciju, Flask-WTF za obradu formi i MongoDB kao bazu podataka za pohranu podataka o člancima. U ovom poglavlju naš cilj je stvoriti jednostavnu, ali funkcionalnu aplikaciju koja omogućava korisnicima kreiranje, uređivanje, brisanje i pregled blog članaka. Dodatno ćemo na kraju uključiti i neke komponente za učinkovitije uređivanje sadržaja i oznaka.
 
 ### Glavne funkcionalnosti aplikacije:
-* **Lista članaka**: Korisnici će moći pregledavati sve blog članke na jednoj stranici. Svaki post će sadržavati naslov, sažetak i osnovne informacije poput autora i datuma.
-* **Pregled pojedinačnih članaka**: Klikom na post, korisnici će biti preusmjereni na stranicu koja prikazuje puni sadržaj članka, uključujući slike i tagove.
-* **Kreiranje članaka**: Aplikacija će omogućiti autorima da kreiraju nove članke putem forme. Ova forma će uključivati potrebna polja kao što su naslov, sadržaj, autor, datum, tagove i slika.
+* **Lista članaka**: Korisnici će moći pregledavati sve blog članke na jednoj stranici. Svaki članak će sadržavati naslov, sažetak i osnovne informacije poput autora i datuma. Prikazivat ćemo samo članke sa statusom "objavljen".
+* **Pregled pojedinačnih članaka**: Klikom na članak, korisnici će biti preusmjereni na stranicu koja prikazuje puni sadržaj članka, uključujući slike i tagove.
+* **Kreiranje članaka**: Aplikacija će omogućiti autorima da kreiraju nove članke putem forme. Ova forma će uključivati potrebna polja kao što su naslov, sadržaj, autor, datum, oznake (tagove) i slike.
 * **Uređivanje članaka**: Autori će moći uređivati postojeće članke. To će uključivati ponovno prikazivanje forme s prethodno unesenim podacima, omogućujući autorima da izvrše izmjene.
-* **Brisanje članaka**: Korisnici će moći brisati članke, čime će se trajno ukloniti podaci iz baze.
+* **Brisanje članaka**: Korisnici će moći brisati članke, čime će se trajno ukloniti podaci iz baze. Autor mora povrditi brisanje u modalnom prozoru.
 
 ### Struktura modela podataka
 Svaki blog članak će imati sljedeće atribute:
 * Naslov (title): Kratak opis članka koji će biti prikazan na listi članaka.
 * Sadržaj (content): Glavni tekst članka.
-* Autor (author): Ime osobe koja je napisala post.
+* Autor (author): Ime osobe koja je napisala članak.
 * Datum (date): Datum kada je članak kreiran.
 * Tagovi (tags): Kategorije ili ključne riječi povezane s člankom, omogućujući korisnicima lakše pretraživanje.
-* Slika (image): veza prema slici koja će biti prikazana u članku.
+* Slika (image): Veza prema slici koja će biti prikazana u članku. Slike ćemo također spremati u MongoDB bazu.
 
 ## Implementacija Blog aplikacije
 
-Da bismo započeli s implementacijom aplikacije za upravljanje blog člancima, prvo ćemo kreirati klasu BlogPostForm koja će koristiti Flask-WTF za obradu formi, zatim ćemo implementirati rutu za kreiranje novog posta i pohraniti članak u MongoDB. Evo koraka koje trebate slijediti:
+Da bismo započeli s implementacijom aplikacije za upravljanje blogom, prvo ćemo kreirati klasu **BlogPostForm** koja će koristiti **Flask-WTF** za obradu formi, zatim ćemo implementirati rutu za kreiranje novog posta i pohraniti članak u MongoDB. Evo koraka koje trebate slijediti:
 
 ### Instalacija pymongo
-Prije nego što počnemo raditi s MongoDB-om u našoj Flask aplikaciji, trebamo instalirati biblioteku pymongo, koja omogućava povezivanje Flask aplikacije s MongoDB-om. Za instalaciju pokrenite naredbu u terminalu:
+Prije nego što počnemo raditi s MongoDB-om u našoj Flask aplikaciji, trebamo instalirati biblioteku **pymongo**, koja omogućava povezivanje Flask aplikacije s MongoDB-om. Za instalaciju pokrenite naredbu u terminalu:
 ```bash
 pip install pymongo
 ```
 Ova biblioteka omogućit će nam rad s kolekcijama i dokumentima unutar MongoDB baze podataka.
 
 ### Postavljanje koda za spajanje na bazu podataka
-Dodajmo slijedeći kod na vrh aplikacije ispod intsaciranje ```app``` objekta:
+Dodajmo slijedeći kod na vrh aplikacije ispod instanciranja ```app``` objekta:
 ```python
 client = MongoClient('mongodb://localhost:27017/')
 db = client['pzw_blog_database']
 posts_collection = db['posts']
 ```
-Pojašnjenje svake linije koda:
+
+**Pojašnjenje koda:**
 
 ```python
 client = MongoClient('mongodb://localhost:27017/')
@@ -106,7 +107,7 @@ Ova linija pristupa bazi podataka unutar MongoDB-a s imenom ```pzw_blog_database
 posts_collection = db['posts']
 ```
 
-Ovdje definiramo kolekciju unutar baze podataka nazvanu ```posts```. Kolekcija je slična tablici u SQL bazama podataka i koristi se za pohranu više dokumenata (redaka) s podacima o blog člancima. MongoDB koristi JSON-sličan format pod nazivom BSON (Binary JSON) za pohranu podataka, što ga čini prikladnim za pohranu nestrukturiranih podataka poput blog članaka.
+Ovdje definiramo kolekciju unutar baze podataka nazvanu ```posts```. Kolekcija je slična tablici u SQL bazama podataka i koristi se za pohranu više dokumenata (redaka) s podacima o blog člancima. MongoDB koristi **JSON**-sličan format pod nazivom **BSON** (Binary JSON) za pohranu podataka, što ga čini prikladnim za pohranu nestrukturiranih podataka poput blog članaka.
 
 Dakle, ovaj kod omogućuje aplikaciji da:
 * Pristupi MongoDB serveru na lokalnom računalu.
@@ -116,7 +117,7 @@ Dakle, ovaj kod omogućuje aplikaciji da:
 
 ### Kreiranje BlogPostForm klase
 
-Slijedeći korak je definiranje obrasca (forme) koja će sadržavati potrebna polja za blog post. Klasa će izgledati ovako:
+Slijedeći korak je definiranje obrasca (forme) koja će sadržavati potrebna polja za blog članak. Klasa će izgledati ovako:
 
 ```python
 from wtforms import StringField, TextAreaField, DateField, FileField
@@ -134,20 +135,20 @@ class BlogPostForm(FlaskForm):
     image = FileField('Blog Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!')])
     submit = SubmitField('Spremi')
 ```
-Ova klasa definirana je na način sličan klasi NameForm iz prethodnog poglavlja, i predstavlja model obrasca našeg blog posta. No pgledajmo koje nove značajke susrećemo ovdje:
-* Polja title i author su StringField koja pohranjuju naslov i ime autora. Koriste validator DataRequired() kako bi osigurao da su polja popunjena.
-* Length(min=5, max=100): Provjerava da je uneseni tekst između 5 i 100 znakova.
-* Polje content je TextAreaField, namijenjeno za unos duljeg teksta (sadržaja blog posta). Nema dodanih validatora, pa je unos u ovo polje opcionalan.
-    * Kasnije ćemo dodati mogućnost unosa sadržaja u MD Markup formatu.
-* Polje date je DateField koje koristi trenutni datum kao zadanu vrijednost putem datetime.today.
-* Polje status je RadioField, koje omogućuje korisniku da odabere između dvije opcije: draft (Skica) i published (Objavljeno). Zadana vrijednost je draft, što znači da će svaki članak biti spremljen kao skica osim ako korisnik ne odabere objavljivanje.
+Ova klasa definirana je na način sličan klasi NameForm iz prethodnog poglavlja, i predstavlja model obrasca našeg blog članka. No pgledajmo koje nove značajke susrećemo ovdje:
+* Polja title i author su **StringField** koja pohranjuju naslov i ime autora. Koriste validator DataRequired() kako bi osigurao da su polja popunjena.
+* **Length(min=5, max=100)**: Provjerava da je uneseni tekst između 5 i 100 znakova.
+* Polje content je **TextAreaField**, namijenjeno za unos duljeg teksta (sadržaja blog posta). Nema dodanih validatora, pa je unos u ovo polje opcionalan.
+    * Kasnije ćemo dodati mogućnost unosa sadržaja u Markdown (MD) formatu.
+* Polje date je **DateField** koje koristi trenutni datum kao zadanu vrijednost putem datetime.today.
+* Polje status je **RadioField**, koje omogućuje korisniku da odabere između dvije opcije: draft (Skica) i published (Objavljeno). Zadana vrijednost je draft, što znači da će svaki članak biti spremljen kao skica osim ako korisnik ne odabere objavljivanje.
 * Polje tags je StringField za unos oznaka povezanih s člankom. Oznake se mogu koristiti za kategorizaciju ili pretraživanje sadržaja, a unos je opcionalan. 
-* Polje image je FileField koje omogućuje korisniku dodavanje slike uz post. Koristi validator FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!') koji dopušta samo određene tipove datoteka (JPEG i PNG slike). Ako korisnik pokuša dodati datoteku drugog tipa, prikazat će se poruka "Samo slike!".
-    * Podršku za unos slika ćemo dodati kasnije.
+* Polje image je **FileField** koje omogućuje korisniku dodavanje slike uz članak. Koristi validator FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!') koji dopušta samo određene tipove datoteka (JPEG i PNG slike). Ako korisnik pokuša dodati datoteku drugog tipa, prikazat će se poruka "Samo slike!".
+    * Podršku za dodavanje slika ćemo dodati kasnije.
 
 
 ### Ruta za kreiranje novog posta
-Sada ćemo definirati rutu koja će omogućiti korisnicima da kreiraju novi blog post. Ova ruta će obrađivati GET zahtjeve za prikaz forme i POST zahtjeve za pohranu podataka u MongoDB.
+Sada ćemo definirati rutu koja će omogućiti korisnicima da kreiraju novi blog članak. Ova ruta će obrađivati GET zahtjeve za prikaz forme i POST zahtjeve za pohranu podataka u MongoDB.
 ```python
 @app.route('/blog/create', methods=["get", "post"])
 def post_create():
@@ -170,9 +171,9 @@ def post_create():
 
 Ova ruta izgleda slično onoj iz prethodnog poglavlja. Nakon validacije, svi uneseni podaci iz obrasca dohvaćaju se pomoću ```.data``` atributa i pohranjuju u novi rječnik ```post```. 
 
-Dalje se koristi ```insert_one()``` metoda iz pymongo biblioteke kako bi se novi članak pohranio u MongoDB kolekciju pod nazivom ```posts_collection```. Svaki put kad korisnik pošalje novu obrazac, stvara se novi dokument u bazi. Metoda ```flash()``` prikazuje poruku korisniku nakon uspješnog unosa, te se preusmejravamo na rutu ```index()```.
+Dalje se koristi ```insert_one()``` metoda iz pymongo biblioteke kako bi se novi članak pohranio u MongoDB kolekciju pod nazivom ```posts_collection```. Svaki put kad korisnik pošalje novu obrazac, stvara se novi dokument u bazi. Metoda ```flash()``` prikazuje poruku korisniku nakon uspješnog unosa, te se preusmjeravamo na rutu ```index()```.
 
-Ako obrazac nije poslan ili ako ima pogreške u unosu, prikazuje se ```blog_edit.html``` predložak s formom obrascem kako bi korisnik mogao vidjeti obrazac ili ispraviti eventualne greške. Stoga kreirajmo taj novi predložak.
+Ako obrazac nije poslan ili ako ima pogreške u unosu, prikazuje se ```blog_edit.html``` predložak s obrascem kako bi korisnik mogao vidjeti podatke u obrascu i ispraviti eventualne greške. Stoga kreirajmo taj novi predložak.
 
 
 ### Prikaz forme za kreiranje posta
@@ -444,11 +445,11 @@ def post_edit(post_id):
 **Pojašnjenje koda**
 Nova  ```post_edit``` ruta radi na način sličan kako smo u prehodnom poglavlju pojasnili rad s formama.
 * Kad korisnik klikne "Uredi" GET metoda se poziva, s ID-om posta. Iz baze dohvaćamo podatke i popunjavamo BlogPostForm objekt s vrijednostima iz baze, te prikazujemo isti predložak ```blog_edit.html``` kao i kod unosa novog posta.
-* Kad korisnik izmijeni sadržaj posta i klikne "Spremi" gumb, poziva se POST metoda, te se provjerava validnost vrijesnoti forme ```form.validate_on_submit()``` metodom. Ukoliko je sve u redu, ažurirat ćemo vrijesnot zapisa u bazi pomoću ```posts_collection.update_one``` metode, salje se poruka o uspješno izvršenoj radnji, te se ponovo prikazujemo post.
+* Kad korisnik izmijeni sadržaj posta i klikne "Spremi" gumb, poziva se POST metoda, te se provjerava validnost vrijesnoti forme ```form.validate_on_submit()``` metodom. Ukoliko je sve u redu, ažurirat ćemo vrijesnot zapisa u bazi pomoću ```posts_collection.update_one``` metode, salje se poruka o uspješno izvršenoj radnji, te se ponovo prikazujemo članak.
 * U slučaju greške (npr. promijenimo CSRF token i sl.), prikazat će se poruka o grešci, te će korisnik biti preusmjeren na ponovno uređenje forme.
 
 ### Brisanje posta
-Sljedeći korak je brisanje posta. I u ovom slučaju ćemo kreirati novu rutu, no u slučaju klika na gumb "Briši" pitat ćemo korisnika da li je siguran da želi pobrisati post. 
+Sljedeći korak je brisanje posta. I u ovom slučaju ćemo kreirati novu rutu, no u slučaju klika na gumb "Briši" pitat ćemo korisnika da li je siguran da želi pobrisati članak. 
 
 Koristit čemo Bootstrap komponentu [Modal](https://getbootstrap.com/docs/5.3/components/modal/) za prikaz dijaloga za potvrdu. *Modal* nam omogućuje da prikažemo prozor s gumbima za potvrdu ili otkazivanje određene radnje. Stoga promijenimo najprije "Briši" gumb u ```blog_view.html```:
 
@@ -577,7 +578,7 @@ Slično dodajmo i u ```post_edit``` rutu, odmah ispod ```posts_collection.update
         )
 ```
 
-Ako sam dodamo ili uredimo neki post, te prenesemo sliku, on će biti spremljena u MongoDB bazu. Ako osvježimo bazu u Compassu, vidjet ćemo dvije nove kolekcije: **fs.files** i **fs.chunks**.
+Ako sam dodamo ili uredimo neki članak, te prenesemo sliku, on će biti spremljena u MongoDB bazu. Ako osvježimo bazu u Compassu, vidjet ćemo dvije nove kolekcije: **fs.files** i **fs.chunks**.
 
 Slijedeći korak je prikaz slike u članku. Najprije dodajmo novu rutu za prikaz slike:
 ```python
