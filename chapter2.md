@@ -594,11 +594,9 @@ def serve_image(image_id):
 
 Još preostaje izmijeniti predloške ```index.html``` i ```blog_view.html``` da prikazuju slike. Odmah ispod naslova u oba predloška dodajmo:
 ```html
-        {% raw %}
-        {% if post.image_id %}
-        <img src="{{ url_for('serve_image', image_id=post.image_id) }}" class="img-fluid" alt="Slika">
-        {% endif %}
-        {% endraw %}
+{% raw %}{% if post.image_id %}
+<img src="{{ url_for('serve_image', image_id=post.image_id) }}" class="img-fluid" alt="Slika">
+{% endif %}{% endraw %}
 ```
 
 Osvježimo glavnu stranicu ili stranicu posta u kojem smo dodali sliku i provjerimo da se slike prikazuju.
@@ -619,7 +617,92 @@ Rezultat je:
 Ovo je **podebljani tekst**, a ovo je *nakošeno*.
 ```
 
+Markdown se često koristi za pisanje dokumentacije, blogova i bilješki, kao i na platformama poput GitHub-a i Reddita, gdje je podržano formatiranje Markdown sintaksom.
 
+Za obradu Markdown sadržaja u Pythonu, koristit ćemo biblioteku **markdown**, koja pretvara Markdown tekst u HTML. Instalacija biblioteke markdown vrši se pomoću pip alata:
+```bash
+pip install markdown
+```
+
+Slijedeći primjer prikazuje kako pretvoriti Markdown tekst u HTML:
+```python
+import markdown
+
+# Markdown sadržaj
+md_text = """
+## Naslov
+Ovo je **podebljani** tekst, a ovo je *nakošeno*.
+"""
+
+# Pretvorba u HTML
+html_content = markdown.markdown(md_text)
+print(html_content)
+```
+
+Rezultat je:
+```html
+<h2>Naslov</h1>
+<p>Ovo je <strong>podebljani</strong> tekst, a ovo je <em>kurziv</em>.</p>
+```
+
+Mi ćemo kreirat ćemo vlastiti **Jinja2 filter** koji će omogućiti pretvorbu Markdown sadržaja u HTML i zatim ga ispravno prikazati u predlošcima. Također ćemo koristiti **safe** filter kako bismo osigurali da HTML koji generiramo iz Markdown-a bude ispravno prikazan. Pa dodajmo ga:
+```python
+import markdown
+
+@app.template_filter('markdown')
+def markdown_filter(text):
+    return markdown.markdown(text)
+```
+
+U predlošcima index.html i blog_view.html primijenimo filter:
+```
+{{ post.content | markdown | safe }}
+```
+Izmijenimo neki post i pogledajmo rezultate.
+
+### Mardown editor (EasyMDE)
+Sljedeći korak će nam biti da omogućimo uređivanje markdown sadržaja u editoru namjenjenom za takve prilike. U tu svrhu ćemo dodati podršku za EasyMDE editor.
+
+**EasyMDE (Easy Markdown Editor)** je jednostavan i popularan JavaScript editor za Markdown tekst. Omogućuje korisnicima da lako uređuju i oblikuju sadržaj koristeći Markdown sintaksu, s pregledom u stvarnom vremenu, te pruža intuitivno korisničko sučelje sa alatnom trakom i značajkama kao što su pregled, automatsko spremanje, numeriranje linija i podrška za tamni način rada.
+
+Dodajmo podršku za EasyMDE u **blog_edit.html** predlošku, na način da uključimo EasyMDE CSS i JavaScript datoteke u njega.
+
+```html
+{% raw %}
+{% extends "base.html" %}
+
+{% block title %}Uređivanje Blog posta{% endblock %}
+
+{% block head %}
+{{ super() }}
+<!-- Uključi EasyMDE CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+
+{% block body %}
+{% from 'bootstrap5/form.html' import render_form %}
+{{ render_form(form) }}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Uključi EasyMDE JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script>
+// Inicijalizacija EasyMDE editora
+var easyMDE = new EasyMDE({ element: document.getElementById('markdown-editor') });
+</script>
+{% endblock %}
+{% endraw %}
+```
+
+U klasi ```BlogPostForm``` promijenimo ```content```:
+```python
+    content = TextAreaField('Sadržaj', render_kw={"id": "markdown-editor"})
+```
+Atribut ```render_kw``` omogućuje dodavanje dodatnih HTML atributa u formu koja se generira iz polja. Ovim dodajemo HTML id atribut s vrijednošću ("markdown-editor"), što omogućava integraciju s EasyMDE editorom.
+
+Detaljnije o korištenju EasyMDE možete pronači na [https://github.com/Ionaru/easy-markdown-editor](https://github.com/Ionaru/easy-markdown-editor).
 
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md)| [Slijedeće poglavlje: Autentikacija](chapter3.md)
