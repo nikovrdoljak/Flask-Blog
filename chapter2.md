@@ -193,7 +193,7 @@ Kreirajte novi predložak ```blog_edit.html``` u *templates* mapi i u njega umet
 
 ### Link za kreiranje posta i navigacijska traka
 Dodat ćemo link koji vodi na stranicu s formom za kreiranje novog posta. Za tu svrhu dodat ćemo navigacijsku traku s linkom.
-Kako bismo dodali navigacijsku traku koristeći Bootstrap u osnovni predložak (base.html), možemo koristiti ugrađene Bootstrap klase. Ova navigacijska traka imat će naslov Flask-Blog i jednu navigacijsku vezu koja vodi na stranicu za kreiranje posta.
+Kako bismo dodali navigacijsku traku koristeći Bootstrap u osnovni predložak (base.html), možemo koristiti ugrađene Bootstrap klase. Ova navigacijska traka imat će naslov Flask-Blog i jednu navigacijsku vezu koja vodi na stranicu za kreiranje članka.
 Otvorite base.html predložak, te dodajte Bootstrap navigacijsku traku u tijelo stranice pomoću sljedećeg HTML koda, odmah ispod ```<div class="container">``` (uklonite ```mt-5``` ako je prisutan):
 ```html
     {% raw %}
@@ -207,7 +207,7 @@ Otvorite base.html predložak, te dodajte Bootstrap navigacijsku traku u tijelo 
 
         <div class="collapse navbar-collapse mt-1" id="navbarNav">
             <ul class="navbar-nav">
-                {{ render_nav_item('post_create', 'Novi post', _use_li = True) }}
+                {{ render_nav_item('post_create', 'Novi članak', _use_li = True) }}
             </ul>
         </div>
     </nav>
@@ -225,7 +225,7 @@ Otvorite base.html predložak, te dodajte Bootstrap navigacijsku traku u tijelo 
 Ovaj dizajn navigacijske trake sada omogućava korisnicima pristup glavnoj stranici i stranici za kreiranje posta, a u daljnjim koracima ćemo dodati i dodatne veze prema potrebi.
 
 **Testiranje**
-Ako ste sve uspješno odradili, nova verzija aplikacije će imati navigacijsku traku s linkom "Novi post". Kliknite ga i pojavit će se stranica s obrascem za unos posta. Popunite obrazac, i kliknite gumb "Spremi". Vrijenosti obrasca bit će spremljeni u MongoDB bazu.
+Ako ste sve uspješno odradili, nova verzija aplikacije će imati navigacijsku traku s linkom "Novi članak". Kliknite ga i pojavit će se stranica s obrascem za unos članka. Popunite obrazac, i kliknite gumb "Spremi". Vrijednosti obrasca bit će spremljeni u MongoDB bazu.
 
 ![Novi post](assets/images/create_post.png)
 
@@ -295,11 +295,12 @@ Sami odaberite koju aplikaciju ćete koristiti za rad s MongoDB-om: Compass ili 
 
 ### Prikaz članaka na glavnoj stranici
 
-Za prikazivanje blog članaka s statusom "published" u početnoj (index) ruti, prvo ćemo dohvatiti sve članke iz MongoDB-a koji imaju status "published". Zatim ćemo ih prikazati u izmijenjenom Jinja predlošku.
+Za prikazivanje blog članaka s statusom "published" u početnoj (index) ruti, prvo ćemo dohvatiti sve članke iz MongoDB-a koji imaju status "published". Zatim ćemo ih prikazati u izmijenjenom predlošku.
 
 Prvo, trebamo prilagoditi rutu i dohvatiti podatke iz baze podataka. Zatim ćemo izmijeniti predložak za prikaz tih podataka.
 
 **Ažuriranje rute**
+
 Ažurirajmo index rutu da dohvaća samo objavljene članke iz kolekcije ```posts_collection```. Izbrišimo što smo u njoj do sad imali i stavimo:
 ```python
 @app.route("/", methods=["GET", "POST"])
@@ -348,7 +349,7 @@ Promijenimo i index.html predložak. U njemu ćemo iterirat kroz listu članaka 
 * Razdvajamo oznake po zarezima ```split(',')``` funkcijom, a ```badge bg-primary``` daje oznakama izgled male značke s plavom bojom.
 
 ### Prikaz pojedinačnog posta
-Implementirat ćemo rutu ```/blog/<post_id>``` koja će prikazivati detalje posta, te omogućiti uređivanje i brisanje članaka, pa nastavimo.
+Implementirat ćemo rutu ```/blog/<post_id>``` koja će prikazivati detalje posta, te omogućiti uređivanje i brisanje članaka.
 
 Prvo ćemo definirati rutu koja će dohvatiti članak pomoću ```post_id```, a zatim prikazati njegov sadržaj u novom predlošku ```blog_edit.html```.
 
@@ -366,7 +367,7 @@ def post_view(post_id):
     return render_template('blog_view.html', post=post)
 ```
 
-Kreirajno i novi predložak ```blog_view.html``` koji će prikazati post:
+Kreirajmo i novi predložak ```blog_view.html``` koji će prikazati post:
 ```html
 {% raw %}
 {% extends "base.html" %}
@@ -395,7 +396,7 @@ Kreirajno i novi predložak ```blog_view.html``` koji će prikazati post:
 ```
 
 Na kraju promijenimo u ```index.html``` link na detalje:
-```html
+```
 <h2><a href="{{ url_for('view_post', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>
 ```
 
