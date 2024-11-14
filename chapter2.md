@@ -444,7 +444,8 @@ def post_edit(post_id):
         flash('Dogodila se greška!', category='warning')
     return render_template('blog_edit.html', form=form)
 ```
-**Pojašnjenje koda**
+**Objašnjenje koda**
+
 Nova  ```post_edit``` ruta radi na način sličan kako smo u prehodnom poglavlju pojasnili rad s formama.
 * Kad korisnik klikne "Uredi" GET metoda se poziva, s ID-om posta. Iz baze dohvaćamo podatke i popunjavamo BlogPostForm objekt s vrijednostima iz baze, te prikazujemo isti predložak ```blog_edit.html``` kao i kod unosa novog posta.
 * Kad korisnik izmijeni sadržaj posta i klikne "Spremi" gumb, poziva se POST metoda, te se provjerava validnost vrijesnoti forme ```form.validate_on_submit()``` metodom. Ukoliko je sve u redu, ažurirat ćemo vrijesnot zapisa u bazi pomoću ```posts_collection.update_one``` metode, salje se poruka o uspješno izvršenoj radnji, te se ponovo prikazujemo članak.
@@ -645,7 +646,7 @@ print(html_content)
 Rezultat je:
 ```html
 <h2>Naslov</h1>
-<p>Ovo je <strong>podebljani</strong> tekst, a ovo je <em>kurziv</em>.</p>
+<p>Ovo je <strong>podebljani</strong> tekst, a ovo je <em>nakošeno</em>.</p>
 ```
 
 Mi ćemo kreirat ćemo vlastiti **Jinja2 filter** koji će omogućiti pretvorbu Markdown sadržaja u HTML i zatim ga ispravno prikazati u predlošcima. Također ćemo koristiti **safe** filter kako bismo osigurali da HTML koji generiramo iz Markdown-a bude ispravno prikazan. Pa dodajmo ga:
@@ -659,7 +660,7 @@ def markdown_filter(text):
 
 U predlošcima index.html i blog_view.html primijenimo filter:
 ```
-{{ post.content | markdown | safe }}
+{% raw %}{{ post.content | markdown | safe }}{% endraw %}
 ```
 Izmijenimo neki članak i pogledajmo rezultate.
 
