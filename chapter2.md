@@ -715,7 +715,7 @@ Detaljnije o korištenju EasyMDE možete pronači na [https://github.com/Ionaru/
 ### Oznake (tagovi) i Choices.js
 Posljednja stvar koju ćemo poboljšati je uređivanje oznaka (tagova) u članku. U tu svrhu ćemo korisiti JavaScript biblioteku **Choices.js**.
 
-Choices.js je JavaScript biblioteka koja poboljšava HTML <select> i <input> elemente pružajući namkorisniku mogućnost odabira ili dodavanja više stavki, poput oznaka, te je vrlo korisna kada uređujete članak s oznakama, jer omogućuje intuitivno dodavanje, uređivanje i uklanjanje istih kroz jednostavno korisničko sučelje.
+Choices.js je JavaScript biblioteka koja poboljšava HTML ```<select>``` i ```<input>``` elemente pružajući korisniku mogućnost odabira ili dodavanja više stavki, poput oznaka, te je vrlo korisna kada uređujete članak s oznakama, jer omogućuje intuitivno dodavanje, uređivanje i uklanjanje istih kroz jednostavno korisničko sučelje.
 
 Dodajmo i podršku za Choices.js u **blog_edit.html** predlošku, na sličan način kao u prethodnoj sekciji odmah ispod EasyMDE:
 ```html
