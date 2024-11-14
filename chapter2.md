@@ -397,14 +397,6 @@ Kreirajmo i novi predložak ```blog_view.html``` koji će prikazati post:
 
 Na kraju promijenimo u ```index.html``` link na detalje:
 ```html
-<h2><a href="{{ url_for('view_post', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>
-```
-
-```
-{{ url_for('view_post', post_id=post['_id']) }}
-```
-
-```
 {% raw %}<h2><a href="{{ url_for('view_post', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>{% endraw %}
 ```
 
@@ -417,7 +409,7 @@ Na dnu posta smo dodali i dva gumba koje ćemo koristiti za uređivanje i brisan
 Da bismo urediti sadržaj posta kreirat ćemo novu rutu, a na gumb "Uredi" postavit ćemo link na rutu.
 Izmijenimo gumb "Uredi":
 ```html
-<a href="{{ url_for('post_edit', post_id=post['_id']) }}" type="button" class="btn btn-primary btn-sm">Uredi</a>
+{% raw %}<a href="{{ url_for('post_edit', post_id=post['_id']) }}" type="button" class="btn btn-primary btn-sm">Uredi</a>{% endraw %}
 ```
 
 Dodajmo novu rutu:
