@@ -396,9 +396,18 @@ Kreirajmo i novi predložak ```blog_view.html``` koji će prikazati post:
 ```
 
 Na kraju promijenimo u ```index.html``` link na detalje:
-```
+```html
 <h2><a href="{{ url_for('view_post', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>
 ```
+
+```
+{{ url_for('view_post', post_id=post['_id']) }}
+```
+
+```
+{% raw %}<h2><a href="{{ url_for('view_post', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>{% endraw %}
+```
+
 
 Ako sad kliknemo na naslov posta na glavnom stranici, otvorit će se stranica samo s tim člankom. 
 
