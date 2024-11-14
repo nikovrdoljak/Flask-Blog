@@ -84,6 +84,9 @@ Ova biblioteka omogućit će nam rad s kolekcijama i dokumentima unutar MongoDB 
 ### Postavljanje koda za spajanje na bazu podataka
 Dodajmo slijedeći kod na vrh aplikacije ispod instanciranja ```app``` objekta:
 ```python
+from pymongo import MongoClient
+
+
 client = MongoClient('mongodb://localhost:27017/')
 db = client['pzw_blog_database']
 posts_collection = db['posts']
@@ -351,7 +354,7 @@ Promijenimo i index.html predložak. U njemu ćemo iterirat kroz listu članaka 
 ### Prikaz pojedinačnog posta
 Implementirat ćemo rutu ```/blog/<post_id>``` koja će prikazivati detalje posta, te omogućiti uređivanje i brisanje članaka.
 
-Prvo ćemo definirati rutu koja će dohvatiti članak pomoću ```post_id```, a zatim prikazati njegov sadržaj u novom predlošku ```blog_edit.html```.
+Prvo ćemo definirati rutu koja će dohvatiti članak pomoću ```post_id```, a zatim prikazati njegov sadržaj u novom predlošku ```blog_view.html```.
 
 ```python
 from bson.objectid import ObjectId
@@ -397,7 +400,7 @@ Kreirajmo i novi predložak ```blog_view.html``` koji će prikazati post:
 
 Na kraju promijenimo u ```index.html``` link na detalje:
 ```html
-{% raw %}<h2><a href="{{ url_for('view_post', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>{% endraw %}
+{% raw %}<h2><a href="{{ url_for('post_view', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></h2>{% endraw %}
 ```
 
 
