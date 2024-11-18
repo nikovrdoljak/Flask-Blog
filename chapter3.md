@@ -7,13 +7,12 @@
 
 **Autentikacija** je proces identifikacije korisnika u aplikaciji kako bi im se omogućio pristup zaštićenim resursima. 
 Flask nudi razne biblioteke i alate za jednostavnu implementaciju autentifikacije. 
-Jedna od najpopularnijih biblioteka za to je **Flask-Login**, koja omogućava rukovanje prijavom, odjavom i zaštitom ruta.
+Jedna od najpopularnijih biblioteka za to je **[Flask-Login](https://flask-login.readthedocs.io/en/latest/)**, koja omogućava rukovanje prijavom, odjavom i zaštitom ruta.
 
 ## Osnovni pojmovi
 * **Prijava (Login):** Korisnik unosi svoje vjerodajnice kako bi se identificirao.
-* **Odjava (Logout):** Proces prekida korisničke sesije.
+* **Odjava (Logout):** Proces prekida korisničku sesije.
 * **Zaštićene rute:** Stranice kojima mogu pristupiti samo prijavljeni korisnici.
-* **Sesije:** Koriste se za praćenje stanja korisnika nakon prijave.
 
 ## Faktori autentikacije
 * **Faktor znanja** – ono što korisnik zna – zaporka, fraza, PIN, odgovor na pitanje
@@ -36,7 +35,7 @@ Da bi se osoba pozitivno autenticirala, poželjno je da elementi barem dva fakto
 ## Implementacije
 Koristit ćemo biblioteku [Flask-Login](https://flask-login.readthedocs.io/en/latest/) za autentifikaciju, a u MongoDB bazu ćemo pohranjivati korisničke podatake.
 
-Prvo instalirajmo flask-login, te dodatak paket *email-validator*:
+Prvo instalirajmo flask-login, te dodatno paket *email-validator*:
 ```bash
 pip install flask-login email-validator
 ```
@@ -44,23 +43,16 @@ Paket **email-validator** služi za provjeru valjanosti sintakse e-mail adrese i
 
 ## Prijava
 
-Za prijavu korisnika u našu aplikaciju koristit ćemo obrazac za prijavu, u koji će korisnik morati upisati svoju email adresu i zaporku. No prije nego nastavimo, naglasimo da zaporku nikad ne smijemo spremati u izvornom obliku. To predstavlja sigurnosni rizik jer:
-* Kompromitirane baze podataka: Ako haker dođe do baze podataka, sve zaporke će biti odmah dostupne u čitljivom obliku.
-* Ponovna upotreba zaporki: Mnogi korisnici koriste iste zaporke na više platformi. Kompromitacija jedne baze podataka može omogućiti pristup drugim računima korisnika.
-* Pravni i etički standardi: Mnoge sigurnosne norme, poput GDPR-a i ISO 27001, zahtijevaju šifriranje osjetljivih podataka.
-* Povjerenje korisnika: Gubitak povjerenja korisnika zbog curenja podataka može uništiti ugled aplikacije.
+Za prijavu korisnika u našu aplikaciju koristit ćemo obrazac za prijavu, u koji će korisnik morati upisati svoju email adresu i zaporku. No prije nego nastavimo, naglasimo da zaporku nikad ne smijemo spremati u izvornom obliku. To predstavlja sigurnosni rizik zbog nekoliko razloga poput:
+* **Kompromitirane baze podataka:** Ako haker dođe do baze podataka, sve zaporke će biti odmah dostupne u čitljivom obliku.
+* **Ponovna upotreba zaporki:** Mnogi korisnici koriste iste zaporke na više platformi. Kompromitiranje jedne baze podataka može omogućiti pristup drugim računima korisnika.
+* **Pravni i etički standardi:** Mnoge sigurnosne norme, poput GDPR-a i ISO 27001, zahtijevaju šifriranje osjetljivih podataka.
+* **Povjerenje korisnika:** Gubitak povjerenja korisnika zbog curenja podataka može uništiti ugled aplikacije ili slično.
 
 Umjesto toga, zaporke treba "heširati" (eng. hashing), što znači da se pretvaraju u nečitljiv niz znakova uz korištenje algoritma.
 
 Flask pruža funkcije za sigurnu obradu zaporki putem biblioteke **werkzeug.security**.
 
-```generate_password_hash```
-* Generira sigurnan "heš" zaporke koristeći algoritam poput PBKDF2, bcrypt ili scrypt.
-* Dodaje salt (nasumični dodatak podacima) kako bi se spriječili napadi pomoću unaprijed izračunatih heševa (npr. *rainbow table attacks*).
-
-```check_password_hash```
-* Provjerava podudara li se unesena zaporka s ranije spremljenim hešom.
-* Uzima unesenu zaporku, ponovo je hešira koristeći isti algoritam i uspoređuje s postojećim hešom.
 
 ### Primjer 
 ```python
@@ -72,6 +64,15 @@ pbkdf2:sha256:50000$ClVWrTj0$d9ef0819c7bcd9ac996079d284f87f4969f3ba09e504c58a839
 >>> check_password_hash(hash1, '123')
 True
 ```
+
+**generate_password_hash**
+* Generira sigurnan "heš" zaporke koristeći algoritam poput PBKDF2, bcrypt ili scrypt.
+* Dodaje salt (nasumični dodatak podacima) kako bi se spriječili napadi pomoću unaprijed izračunatih heševa (npr. *rainbow table attacks*).
+
+**check_password_hash**
+* Provjerava podudara li se unesena zaporka s ranije spremljenim hešom.
+* Uzima unesenu zaporku, ponovo je hešira koristeći isti algoritam i uspoređuje s postojećim hešom.
+
 
 ### Obrazac za prijavu
 Dodajmo najprije klasu za *login* obrazac u ```app.py```:
