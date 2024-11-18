@@ -126,7 +126,9 @@ Dodjamo i novi predložak **login.html**
 ```
 
 Te link za prijavu u baznom predlošku:
-```{{ render_nav_item('login', 'Prijava', _use_li = True) }}```
+```
+{{ render_nav_item('login', 'Prijava', _use_li = True) }}
+```
 
 Pokrenimo aplikaciju, kliknimo na novi link i potvrdimo da je obrazac za prijavu prikazan. Sad slijedi implementacija prijave korisnika.
 
@@ -235,4 +237,56 @@ def login():
 * Sigurnosna provjera **next** sigurava da korisnik ne bude preusmjeren na zlonamjerni URL.
   * Ako korisnik pokušava pristupiti zaštićenoj stranici prije prijave, parametar next će sadržavati URL te stranice.
   * Ako next nije valjan (npr. ne počinje s /), korisnik će biti preusmjeren na početnu stranicu aplikacije (index).
+
+Dodajmo u ```index.html``` prikaz informacija o prijavljenom korisniku koje se nalaze u **current_user** objektu:
+* **is_authenticated**: Provjerava je li korisnik uspješno prijavljen.
+* **is_active**: Koristi se za provjeru je li korisnički račun aktivan.
+* **is_anonymous**: Provjerava je li korisnik anoniman.
+* **get_id()**: Dohvaća jedinstveni ID korisnika, potreban Flask-Loginu za identifikaciju korisnika unutar sesije.
+
+```html
+<div class="mt-4">
+    <h4>current_user:</h4>
+    <p>is_authenticated: <b>{{current_user.is_authenticated}}</b></p>
+    <p>is_active: <b>{{current_user.is_active}}</b></p>
+    <p>is_anonymous: <b>{{current_user.is_anonymous}}</b></p>
+    <p>get_id(): <b>{{current_user.get_id()}}</b></p>
+</div>
+```
+
+Također na na sve tri blog *CUD* rute dodajmo **@login_required** dekorator.
+On osigurava da samo prijavljeni korisnici mogu pristupiti ovim rutama.
+Ako korisnik nije prijavljen, bit će preusmjeren na stranicu za prijavu, a nakon prijave, bit će vraćen na rutu s koje je došao (ako je parametar *next* ispravno konfiguriran).
+
+```python
+@app.route('/blog/create', methods=["get", "post"])
+@login_required
+def post_create():
+```
+
+## Odjava
+Kad je korisnik prijavljen, moramo dodati mogućnost i da se odjavi. Pa prominenimo u baznom predlošku dio s linkom za prijavu i dodajmo rutu **logout** za odjavu.
+
+```html
+{% if current_user.is_authenticated %}
+    {{ render_nav_item('logout', 'Odjava', _use_li = True) }}
+{% else %}
+    {{ render_nav_item('login', 'Prijava', _use_li = True) }}
+{% endif %}
+```
+
+Ruta za odjavu:
+```python
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Odjavili ste se.', category='success')
+    return redirect(url_for('index'))
+```
+
+## Registracija i spremanje korisniku u bazu podataka
+Sad ćemo dodati funkcionalnost registracije. Kreirat ćemo rutu i predložak s formom za registraciju. 
+Kad se novi posjetitelj registrira, njegov email i password ćemo spremiti u bazu, u novu kolekciju (tablicu) "Users".
+Pri logiranju, provjerit ćemo da li taj korisnik postoji u bazi i da li je upisao ispravan password u obrascu. 
 
