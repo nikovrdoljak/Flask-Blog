@@ -105,6 +105,7 @@ def login():
 
 Dodjamo i novi predložak **login.html**
 ```html
+{% raw %}
 {% extends "base.html" %}
 {% from 'bootstrap5/form.html' import render_form %}
 
@@ -120,6 +121,7 @@ Dodjamo i novi predložak **login.html**
     </div>
 </div>
 {% endblock %}
+{% endraw %}
 ```
 
 Te link za prijavu u baznom predlošku:
