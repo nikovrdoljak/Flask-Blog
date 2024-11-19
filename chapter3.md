@@ -285,8 +285,187 @@ def logout():
     return redirect(url_for('index'))
 ```
 
-## Registracija i spremanje korisniku u bazu podataka
-Sad ćemo dodati funkcionalnost registracije. Kreirat ćemo rutu i predložak s formom za registraciju. 
-Kad se novi posjetitelj registrira, njegov email i password ćemo spremiti u bazu, u novu kolekciju (tablicu) "Users".
-Pri logiranju, provjerit ćemo da li taj korisnik postoji u bazi i da li je upisao ispravan password u obrascu. 
+## Registracija
+Sad ćemo dodati funkcionalnost registracije. Kreirat ćemo rutu i predložak s obrascem za registraciju. 
+Kad se novi posjetitelj registrira, njegov email i zaporku ćemo spremiti u bazu, u novu kolekciju (tablicu) "Users".
+Kod prijave, provjerit ćemo da li taj korisnik postoji u bazi i da li je upisao ispravnu zaporku u obrascu. 
 
+Dodajmo klasu obrasca za registraciju. Odmah ćemo pri registaciji postaviti i da korisnik dva put upiše zaporku i da budu iste.
+```python
+from wtforms.validators import EqualTo
+
+class RegisterForm(FlaskForm):
+    email = StringField('E-mail', validators=[DataRequired(), Length(3, 64), Email()])
+    password = PasswordField('Zaporka', validators=[DataRequired(), EqualTo('password2', message='Zaporke moraju biti jednake.')])
+    password2 = PasswordField('Potvrdi zaporku', validators=[DataRequired()])
+    submit = SubmitField('Registracija')
+```
+
+No prije nego je dodamo, prebacimo dio kod s klasama za obrasce. Razdvajanje koda prema funkcionalnosti poboljšava organizaciju i čitljivost koda, a i održavanje je lakše.
+Stoga kreirajmo datoteku **forms.py**, te u nju prebacimo kod s klasama obrazaca:
+
+```python
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, FileField, TextAreaField, RadioField, DateField, FileField, PasswordField, BooleanField
+from wtforms.validators import DataRequired, Length, Email, EqualTo
+from flask_wtf.file import FileAllowed
+from datetime import datetime
+
+class BlogPostForm(FlaskForm):
+    title = StringField('Naslov', validators=[DataRequired(), Length(min=5, max=100)])
+    content = TextAreaField('Sadržaj', render_kw={"id": "markdown-editor"})
+    author = StringField('Autor', validators=[DataRequired()])
+    status = RadioField('Status', choices=[('draft', 'Skica'), ('published', 'Objavljeno')], default='draft')
+    date = DateField('Datum', default=datetime.today)
+    tags = StringField('Oznake', render_kw={"id": "tags"})
+    image = FileField('Blog Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!')])
+    submit = SubmitField('Spremi')
+
+class LoginForm(FlaskForm):
+    email = StringField('E-mail', validators=[DataRequired(), Length(1, 64), Email()])
+    password = PasswordField('Zaporka', validators=[DataRequired()])
+    remember_me = BooleanField('Ostani prijavljen')
+    submit = SubmitField('Prijava')
+
+class RegisterForm(FlaskForm):
+    email = StringField('E-mail', validators=[DataRequired(), Length(3, 64), Email()])
+    password = PasswordField('Zaporka', validators=[DataRequired(), EqualTo('password2', message='Zaporke moraju biti jednake.')])
+    password2 = PasswordField('Potvrdi zaporku', validators=[DataRequired()])
+    submit = SubmitField('Registracija')
+```
+
+Novi **RegisterForm** obrazac sadrži dva polja za upis zaporke čime želimo osigurati da korisnik pri registraciji ispravno upiše zaporku. Dodali smo i novi validator, **EqualTo()**, koji zahtjeva da obje zaporke budu jednake.
+
+U **app.py** pobrišimo dio s:
+
+```
+from flask_wtf import FlaskForm
+from wtforms.validators import DataRequired
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, FileField, TextAreaField, RadioField, DateField, FileField, PasswordField, BooleanField
+from wtforms.validators import DataRequired, Length, Email
+from flask_wtf.file import FileAllowed
+```
+
+A dodajmo:
+```python
+from forms import BlogPostForm, LoginForm, RegisterForm
+```
+
+Dodajmo rutu za registraciju. Ova ruta će najprije prikazati formu (register.html).
+Ruta provjerava da li je forma ispravna (pwd veći od 2 znaka i oba pwda ista).
+Zatim dohvaća iz requesta vrijednost emaila i passworda.
+Provjerava da li u bazi već postoji taj user, te ako postoji prekida izvršavanje.
+Password hashiramo (```generate_password_hash()```). Znači u bazi će uvijek biti kriptirani password.
+U bazu spremamo korisnika, ispisujemo poruku, te navodimo usera da se prijavi s novim podacima.
+```python
+from werkzeug.security import generate_password_hash, check_password_hash
+
+users_collection = db['users']
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        email = request.form['email']
+        password = request.form['password']
+        existing_user = users_collection.find_one({"email": email})
+
+        if existing_user:
+            flash('Korisnik već postoji', category='error')
+            return redirect(url_for('register'))
+
+        hashed_password = generate_password_hash(password)
+        users_collection.insert_one({
+            "email": email,
+            "password": hashed_password
+        })
+        flash('Registracija uspješna. Sad se možete prijaviti', category='success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html', form=form)
+```
+
+Objašnjenje:
+* ako su podaci iz obrasca ispravni, najprije ćemo provjeriti da li upisana email adresa već postoji u bazi. Ako postoji, vratit ćemo grešku.
+* zaporku ćemo *heširati* pomoću **generate_password_hash** metode.
+* podatke zapisujemu u bazu.
+
+Dodajmo novi  **register.html** predložak:
+```html
+{% raw %}
+{% extends "base.html" %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block title %}Registracija{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>Registracija</h1>
+    </div>
+    <div class="col-md-4">
+        {{ render_form(form) }}
+    </div>
+</div>
+{% endblock %}
+{% raw %}
+```
+
+Dodajmo u **base.html** i odmah ispod linka za prijavu:
+```
+{{ render_nav_item('register', 'Registracija', _use_li = True) }}
+```
+
+Pokrenimo aplikaciju i registrirajmo se.
+* Provjerimo da ispravno radi validacija obje zaporke.
+* Po uspješnoj registraciji provjerite da se u MongoDB bazi sad nalazi i kolekcija **users**.
+* Vidjet ćete da je zaporka u bazi *kriptirana*.
+
+Slijedeće što moramo napraviti jest da izmijenimo **login** rutu da provjeri da li je korisnik upisan u bazu, i da je zaporka ispravna. Provjeravamo je pomoću **check_password_hash()** metode. Zatim kreiramo instancu user objekta, te pozivamo **login_user** metodu.
+
+```python
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = request.form['email']
+        password = request.form['password']
+        user_data = users_collection.find_one({"email": email})
+
+        if user_data is not None and check_password_hash(user_data['password'], password):
+            user = User(user_data['email'])
+            login_user(user, form.remember_me.data)
+            next = request.args.get('next')
+            if next is None or not next.startswith('/'):
+                next = url_for('index')
+            flash('Uspješno ste se prijavili!', category='success')
+            return redirect(next)
+        flash('Neispravno korisničko ime ili zaporka!', category='warning')
+    return render_template('login.html', form=form)
+```
+
+Izmijenimo i **load_user** metodu, te **User** klasu:
+
+```python
+@login_manager.user_loader
+def load_user(email):
+    user_data = users_collection.find_one({"email": email})
+    if user_data:
+        return User(user_data['email'])
+    return None
+
+class User(UserMixin):
+    def __init__(self, email):
+        self.id = email
+
+    @classmethod
+    def get(self_class, id):
+        try:
+            return self_class(id)
+        except UserNotFoundError:
+            return None
+
+class UserNotFoundError(Exception):
+    pass
+```
