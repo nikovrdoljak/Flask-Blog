@@ -409,7 +409,7 @@ Dodajmo novi  **register.html** predložak:
     </div>
 </div>
 {% endblock %}
-{% raw %}
+{% endraw %}
 ```
 
 Dodajmo u **base.html** i odmah ispod linka za prijavu:
