@@ -1045,7 +1045,7 @@ app.jinja_env.filters['localize_status'] = localize_status
 
 Te doajmo filter za status u predložak:
 ```html
-<td>{{ post.status | localize_status }}</td>
+{% raw %}<td>{{ post.status | localize_status }}</td>{% endraw %}
 ```
 
 Vidimo i da brisanje ne radi. Razlog tome je što se *modal* za brisanjei pripadni JS kod nalazi u **blog_view.html** predlošku. Samo *deleteModal* sekciju ga prebacimo na dno **base.html** predloška i provjerimo da li brisanje sad radi.
