@@ -839,7 +839,7 @@ def profile():
 
 Te novi predložak **profile.html**:
 ```html
-{% extends "base.html" %}
+{% raw %}{% extends "base.html" %}
 
 {% block title %}Vaš profil{% endblock %}
 {% block head %}
@@ -860,7 +860,7 @@ Te novi predložak **profile.html**:
     <script>
         var easyMDE = new EasyMDE({ element: document.getElementById('markdown-editor') });
     </script>
-{% endblock %}
+{% endblock %}{% endraw %}
 ```
 
 Dodajmo i link za profilnu rutu u **base.html**:
@@ -909,14 +909,14 @@ return render_template('profile.html', form=form, image_id=user_data["image_id"]
 
 A u predložak dodajmo prikaz slike s desne strane obrasca:
 ```html
-<div class="row">
+{% raw %}<div class="row">
     <div class="col-6">{{ render_form(form) }}</div>
     <div class="col-6">
         {% if image_id %}
         <img src="{{ url_for('serve_image', image_id=image_id) }}" class="img-thumbnail" style="max-width: 150px;" alt="User photo">
         {% endif %}
     </div>
-</div>
+</div>{% endraw %}
 ```
 
 ### Spremanje korisnika kao autora članka
@@ -942,9 +942,9 @@ Dodatno malo uredimo uredimo aplikaciju:
 * U navbaru maknimo link "Početna"
 * U navbaru stavimo da se "Novi post" prikazuje samo ako je korisnik prijavljen:
 * ```html
-                    {% if current_user.is_authenticated %}
+                    {% raw %}{% if current_user.is_authenticated %}
                     {{ render_nav_item('post_create', 'Novi post', _use_li = True) }}
-                    {%endif%}
+                    {%endif%}{% endraw %}
 ```   
 * Dodajmo **sticky-top** css klasu u navbar, kako bi traka uvijek bila prikazana na vrhu stranice.
 * Dodajmo i podnožje u bazni predložak na kraj div containera:
