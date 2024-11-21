@@ -974,7 +974,7 @@ def my_posts():
 
 Dodjamo link u **base.html** ispod "Novi post":
 ```python
-{{ render_nav_item('my_posts', 'Moji postovi', _use_li = True) }}
+{% raw %}{{ render_nav_item('my_posts', 'Moji postovi', _use_li = True) }}{% endraw %}
 ```
 
 Kreirajmo novi predložak **my_posts.html**:
