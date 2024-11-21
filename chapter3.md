@@ -127,7 +127,9 @@ Dodjamo i novi predložak **login.html**
 
 Te link za prijavu u baznom predlošku:
 ```
+{% raw %}
 {{ render_nav_item('login', 'Prijava', _use_li = True) }}
+{% endraw %}
 ```
 
 Pokrenimo aplikaciju, kliknimo na novi link i potvrdimo da je obrazac za prijavu prikazan. Sad slijedi implementacija prijave korisnika.
@@ -736,4 +738,4 @@ app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 ```
 
-S ovim korakom smo završili dio s registracjiom novog korisnika.
+S ovim korakom smo završili dio s registracijom novog korisnika.
