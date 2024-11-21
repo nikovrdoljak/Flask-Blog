@@ -919,5 +919,42 @@ A u predložak dodajmo prikaz slike s desne strane obrasca:
 </div>
 ```
 
+### Spremanje korisnika kao autora članka
 
+Želimo da se sad prilikom spremanja novog članka autor više ne upisuje u obrascu već da je autor prijavljeni korisnik.
+Najprije maknimo polje **author** iz **BlogPostForm** klase.
 
+U bazu spremamo id prijavljenog korisnika, pa u **create_post()** metodi izmijenio taj dio:
+```python
+'author': current_user.get_id(),
+```
+
+I u **edit_post()** metodi izbrišimo *author*:
+```
+        form.author.data = post['author']
+```
+
+Sad upišimo novi članak i provjerimo u bazi da li je autor prijavljeni korisnik.
+
+Dodatno malo uredimo uredimo aplikaciju:
+* Maknimo H1 naslov iz **index.html**
+* Maknimo podatke o korisniku sa glavne stranice. Izbrite dio koji se odnosi na *"current_user:"* iz **index.html**
+* U navbaru maknimo link "Početna"
+* U navbaru stavimo da se "Novi post" prikazuje samo ako je korisnik prijavljen:
+* ```html
+                    {% if current_user.is_authenticated %}
+                    {{ render_nav_item('post_create', 'Novi post', _use_li = True) }}
+                    {%endif%}
+```   
+* Dodajmo **sticky-top** css klasu u navbar, kako bi traka uvijek bila prikazana na vrhu stranice.
+* Dodajmo i podnožje u bazni predložak na kraj div containera:
+```html
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <p class="col-md-6 mb-0 text-body-secondary">© 2024 Flask-Blog</p>
+            <ul class="nav col-md-6 justify-content-end">
+                <li class="nav-item"><a href="{{url_for('index')}}" class="nav-link px-2 text-body-secondary">Početna</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Dokumentacija</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">O nama</a></li>
+            </ul>
+        </footer>
+```
