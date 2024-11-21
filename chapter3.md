@@ -737,3 +737,60 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 ```
 
 S ovim korakom smo završili dio s registracijom novog korisnika.
+
+## Korisnički profil
+
+Slijedeće što ćemo napraviti jest da korisnik može urediti svoj profil s podacima i slikom.
+Najprije malo uredimo navigacijsku traku, pa izmijenimo taj dio u **base.html**:
+```html
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
+            <a class="navbar-brand" href="{{url_for('index') }}">Flask-Blog</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    {{ render_nav_item('index', 'Početna', _use_li = True) }}
+                    {{ render_nav_item('post_create', 'Novi post', _use_li = True) }}
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            {{current_user.get_id()}}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item icon-link" href="#"><i class="bi bi-person mb-2"></i>Profil</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item icon-link" href="{{url_for('logout') }}"><i class="bi bi-box-arrow-right mb-2"></i>Odjava</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    {{ render_nav_item('login', 'Prijava', _use_li = True) }}
+                    {{ render_nav_item('login', 'Registracija', _use_li = True) }}
+                    {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </nav>
+```
+
+Dodajmo i CDN za Bootstrap ikone u base.html:
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+```
+
+Sad ako je korisnik prijavljen, s desne strane bit će prikazano:
+
+![Korisnik prijavljen](assets/images/logged.png)
+
+A ako nije prijavljen:
+
+![Korisnik nije prijavljen](assets/images/not-logged.png)
+
