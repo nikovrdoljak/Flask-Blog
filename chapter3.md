@@ -866,7 +866,7 @@ Te novi predložak **profile.html**:
 
 Dodajmo i link za profilnu rutu u **base.html**:
 ```html
-<a class="dropdown-item icon-link" href="{{url_for('profile') }}"><i class="bi bi-person mb-2"></i>Profil</a>
+{% raw %}<a class="dropdown-item icon-link" href="{{url_for('profile') }}"><i class="bi bi-person mb-2"></i>Profil</a>{% endraw %}
 ```
 
 Pokrenite aplikaciju, idite na profilnu stranicu i upišite svoje podatke. U MonguDB možete vidjeti da su podaci ažurirani.
