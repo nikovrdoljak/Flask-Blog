@@ -561,7 +561,7 @@ def send_confirmation_email(user_email):
 
 Kreirajmo i email_confirmation.html predložak:
 ```html
-<!DOCTYPE html>
+{% raw %}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -654,7 +654,7 @@ Kreirajmo i email_confirmation.html predložak:
         </tr>
     </table>
 </body>
-</html>
+</html>{% endraw %}
 ```
 
 U ruti za registraciju dodajmo kod za slanje emaila:
@@ -734,6 +734,7 @@ app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
 app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 ```
 
 S ovim korakom smo završili dio s registracijom novog korisnika.
