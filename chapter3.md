@@ -331,8 +331,8 @@ class LoginForm(FlaskForm):
 
 class RegisterForm(FlaskForm):
     email = StringField('E-mail', validators=[DataRequired(), Length(3, 64), Email()])
-    password = PasswordField('Zaporka', validators=[DataRequired(), EqualTo('password2', message='Zaporke moraju biti jednake.')])
-    password2 = PasswordField('Potvrdi zaporku', validators=[DataRequired()])
+    password = PasswordField('Zaporka', validators=[DataRequired(), Length(3, 30), EqualTo('password2', message='Zaporke moraju biti jednake.')])
+    password2 = PasswordField('Potvrdi zaporku', validators=[DataRequired(), Length(3, 30)])
     submit = SubmitField('Registracija')
 ```
 
@@ -354,10 +354,10 @@ A dodajmo:
 from forms import BlogPostForm, LoginForm, RegisterForm
 ```
 
-Dodajmo rutu za registraciju. Ova ruta će najprije prikazati formu (register.html).
-Ruta provjerava da li je forma ispravna (pwd veći od 2 znaka i oba pwda ista).
-Zatim dohvaća iz requesta vrijednost emaila i passworda.
-Provjerava da li u bazi već postoji taj user, te ako postoji prekida izvršavanje.
+Dodajmo rutu za registraciju. Ova ruta će najprije prikazati obrazac (register.html).
+Ruta provjerava da li je forma ispravna (zaporka duža od 2 znaka i obje zaporke su jednake).
+Zatim dohvaća iz request obkjekta vrijednost emaila i passworda.
+Provjerava da li u bazi već postoji taj korisnik, te ako postoji prekida izvršavanje.
 Password hashiramo (```generate_password_hash()```). Znači u bazi će uvijek biti kriptirani password.
 U bazu spremamo korisnika, ispisujemo poruku, te navodimo usera da se prijavi s novim podacima.
 ```python
@@ -395,7 +395,6 @@ Objašnjenje:
 
 Dodajmo novi  **register.html** predložak:
 ```html
-{% raw %}
 {% extends "base.html" %}
 {% from 'bootstrap5/form.html' import render_form %}
 
@@ -411,7 +410,6 @@ Dodajmo novi  **register.html** predložak:
     </div>
 </div>
 {% endblock %}
-{% endraw %}
 ```
 
 Dodajmo u **base.html** i odmah ispod linka za prijavu:
