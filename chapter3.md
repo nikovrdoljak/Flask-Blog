@@ -414,7 +414,7 @@ Dodajmo novi  **register.html** predložak:
 
 Dodajmo u **base.html** i odmah ispod linka za prijavu:
 ```
-{{ render_nav_item('register', 'Registracija', _use_li = True) }}
+{% raw %}{{ render_nav_item('register', 'Registracija', _use_li = True) }}{% endraw %}
 ```
 
 Pokrenimo aplikaciju i registrirajmo se.
