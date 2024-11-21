@@ -743,6 +743,7 @@ S ovim korakom smo završili dio s registracijom novog korisnika.
 Slijedeće što ćemo napraviti jest da korisnik može urediti svoj profil s podacima i slikom.
 Najprije malo uredimo navigacijsku traku, pa izmijenimo taj dio u **base.html**:
 ```html
+{% raw %}
         <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
             <a class="navbar-brand" href="{{url_for('index') }}">Flask-Blog</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -779,12 +780,14 @@ Najprije malo uredimo navigacijsku traku, pa izmijenimo taj dio u **base.html**:
                 </ul>
             </div>
         </nav>
+{% endraw %}        
 ```
 
-Dodajmo i CDN za Bootstrap ikone u base.html:
+Dodajmo i CDN za Bootstrap ikone u base.html, jer želimo prikazati i dvije ikone (*person* i *box-arrow-right*) u izborniku:
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 ```
+Pregled svih ikona možete naći na adresi [https://icons.getbootstrap.com/](https://icons.getbootstrap.com/)
 
 Sad ako je korisnik prijavljen, s desne strane bit će prikazano:
 
@@ -793,4 +796,6 @@ Sad ako je korisnik prijavljen, s desne strane bit će prikazano:
 A ako nije prijavljen:
 
 ![Korisnik nije prijavljen](assets/images/not-logged.png)
+
+
 
