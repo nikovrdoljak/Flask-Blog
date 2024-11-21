@@ -469,3 +469,271 @@ class User(UserMixin):
 class UserNotFoundError(Exception):
     pass
 ```
+
+Potvrdite da sve ispravno radi prijavom email adrese koju ste registrirali.
+
+## Aktivacija korisnika i slanje emaila
+
+Prilikom registracije, korisnik je mogao upisati bilo koju email adresu. No ipak, email adresu bi trebalo provjeriti. Provjera e-mail adrese smanjuje rizik od lažnih računa, jer korisnik mora potvrditi da je adresa valjana i u njegovom vlasništvu.
+Stoga ćemo implementirati validaciju na način da ćemo poslati e-mail s linkom za potvrdu registracije.
+Stoga ćemo prilikom registracije u bazui spremiti dodatno polje **is_confirmed**, poslati korisnik email s linkom za verifikaciju email adrese, i kad korisnik klikne link, naša nova ruta će ažurirati podatak u bazi da je email adresa potvrđena.
+
+Najprije pri registraciji promijenimo da se sprema podatak **is_confirmed = False**:
+```python
+        users_collection.insert_one({
+            "email": email,
+            "password": hashed_password,
+            "is_confirmed": False
+        })
+```
+
+U rutu login za prijavu dodajmo:
+```python
+        if user_data is not None and check_password_hash(user_data['password'], password):
+            if not user_data.get('is_confirmed', False):
+                flash('Molimo potvrdite vašu e-mail adresu prije prijave.', category='warning')
+                return redirect(url_for('login'))
+```
+
+Sad se korisnik ne može prijaviti dok ne potvrdi svoju email adresu.
+Email koji ćemo poslati korisniku mora sadržavati link s verifikacijskim tokenom koji će sadržavati njegovu email adresu i vremensku oznaku, a za to ćemo koristiti Flask biblioteku **itsdangerous**.
+Dodajmo stoga dvije nove metode:
+```python
+from itsdangerous import URLSafeTimedSerializer
+
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    return serializer.dumps(email, salt='email-confirmation-salt')
+
+def confirm_token(token, expiration=3600):  # Token expires in 1 hour
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(token, salt='email-confirmation-salt', max_age=expiration)
+    except:
+        return False
+    return email
+```
+
+### Slanje maila s tokenom za verifikaciju
+Za potrebe demonstacije koristit ćemo svoj GMail račun.
+
+Za slanje email treba nam **Flask-Mail** biblioteka, pa je instalirajmo:
+```bash
+pip install Flask-Mail
+```
+Flask-Mail koristi SMTP poslužitelj za slanje e-maila. 
+
+Koristit ćemo Gmail račun kao SMTP poslužitelj, stoga trebamo omogućiti pristup aplikacijama *trećih strana*:
+
+* Kreiranje App Password
+    * Idite na Google Account Security.
+    * Pod "Signing in to Google", omogućite 2-Step Verification.
+    * Nakon toga, kreirajte App Password:
+        * Izaberite aplikaciju (npr. "Mail") i uređaj (npr. "Other").
+        * Kopirajte generirani App Password i koristite ga umjesto vaše lozinke.
+
+**Sigurnosne mjere**: Nikada nemojte spremati App Password direktno u kod. Umjesto toga, koristit ćemo environment variables (kasnije).
+
+**Napomena**: Na sličan način možete koristiti i svoj Outlook račun ili neki drugi.
+
+Dodajmo sljedeći kod za konfiguriranje i slanje emaila:
+```python
+from flask_mail import Mail, Message
+
+# Konfiguracija Flask-Mail-a
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'vas.racun@gmail.com'
+app.config['MAIL_PASSWORD'] = 'abcd abcd abcd abcd'   # from Google app password
+app.config['MAIL_DEFAULT_SENDER'] = 'vas.racun@gmail.com'
+
+mail = Mail(app)
+
+def send_confirmation_email(user_email):
+    token = generate_confirmation_token(user_email)
+    confirm_url = url_for('confirm_email', token=token, _external=True)
+    html = render_template('email_confirmation.html', confirm_url=confirm_url)
+    subject = "Molimo potvrdite email adresu"
+    msg = Message(subject, recipients=[user_email], html=html)
+    mail.send(msg)
+```
+
+Kreirajmo i email_confirmation.html predložak:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email potvrda</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border: 1px solid #eaeaea;
+            padding: 20px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        /* Fix for Outlook */
+        img {
+            border: none;
+            display: block;
+            outline: none;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" bgcolor="#f8f9fa" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <!-- Start Container -->
+                <table class="container" align="center" width="600" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            <h2 style="text-align: center; color: #333;">Potvrdite vašu email adresu</h2>
+                            <p>Poštovani {{ user_email }},</p>
+                            <p>Zahvaljujemo na registraciji. Da biste potvrdili svoju prijavu, molimo kliknite na slijedeći link:</p>
+        
+                            <!-- Button Section -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ confirm_url }}" class="btn-primary" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px;">Potvrdite email adresu</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p>Ako niste kreirali ovaj račun, možete ignorirati ovaj email.</p>
+        
+                            <p>Srdačan pozdrav,<br>Vaš FlaskBlog.</p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td class="footer">
+                            <p>&copy; {{ current_year }} FlaskBlog. Sva prava pridržana.</p>
+                        </td>
+                    </tr>
+                </table>
+                <!-- End Container -->
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+```
+
+U ruti za registraciju dodajmo kod za slanje emaila:
+```python
+        users_collection.insert_one({
+            "email": email,
+            "password": hashed_password,
+            "is_confirmed": False
+        })
+        send_confirmation_email(email)
+        flash('Registracija uspješna. Da biste nastavili s radom provjerite svoj email i validirajte registaciju klikom na link u emailu.', category='success')
+```
+
+Dodajmo i rutu za potvrdu email adrese:
+```python
+@app.route('/confirm/<token>')
+def confirm_email(token):
+    try:
+        email = confirm_token(token)
+    except:
+        flash('Link za potvrdu je neisprava ili je istekao.', 'danger')
+        return redirect(url_for('unconfirmed'))
+
+    user = users_collection.find_one({'email': email})
+    if user['is_confirmed']:
+        flash('Vaš račun je već potvrđen. Molimo prijavite se.', 'success')
+    else:
+        users_collection.update_one({'email': email}, {'$set': {'is_confirmed': True}})
+        flash('Vaš račun je potvrđen. Hvala! Molimo prijavite se.', 'success')
+    
+    return redirect(url_for('login'))
+```
+
+### Sigurnosne mjere i environment varijable
+
+App Password ne smijemo spremiti direktno u kod. Umjesto toga, koristit ćemo *environment variables*. Stoga ćemo osjetljive podatke poput **MAIL_SERVER, MAIL_USERNAME i MAIL_PASSWORD** spremiti u **.env** datoteku. Nju ćemo učitati korištenjem **load_dotenv()** funkcije.
+Koristit ćemo **os.getenv()** za pristup varijablama. 
+
+Kreirajmo datoteku **.env** (zamijenite email adresu i zaporku s vašom):
+```
+SECRET_KEY = 'nekakav komplicirani string'
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 587
+MAIL_USE_TLS = True
+MAIL_USERNAME = 'vas.racun@gmail.com'
+MAIL_PASSWORD = 'abcd abcd abcd abcd'
+MAIL_DEFAULT_SENDER = 'vas.racun@gmail.com'
+```
+
+Dodajmo u **.env** u **.gitignore** datoteku, tako da ne bude prebačena u Git repozitorij:
+```
+/venv
+/__pycache__
+/.vscode
+.env
+```
+
+Instalirajmo **python-dotenv**:
+```bash
+pip install python-dotenv
+```
+
+Dodajmo sljedeći Python kod u **app.py**:
+```python
+from dotenv import load_dotenv
+import os
+
+# Učitajmo varijable iz. .env datoteke prije instanciranja Flask aplikacije
+load_dotenv()
+
+app = Flask(__name__)
+
+app.secret_key = os.getenv('SECRET_KEY')
+
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+```
+
+S ovim korakom smo završili dio s registracjiom novog korisnika.
