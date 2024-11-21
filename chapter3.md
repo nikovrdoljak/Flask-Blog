@@ -958,3 +958,93 @@ Dodatno malo uredimo uredimo aplikaciju:
             </ul>
         </footer>
 ```
+
+## Moji članci
+Jedan od zahtjeva ove aplikacije jest da prijavljeni korisnik može vidjeti sve svoje članke na jednom mjestu, uključivši i objavljene i neobjavljene.
+
+Stoga kreirajmo novu rutu **myposts**, link i predložak s tablicom članaka za ovu značajku:
+Ruta:
+```python
+@app.route("/myposts")
+def my_posts():
+    posts = posts_collection.find({"author": current_user.get_id()}).sort("date", -1)
+    return render_template('my_posts.html', posts = posts)
+```
+
+Dodjamo link u **base.html** ispod "Novi post":
+```python
+{{ render_nav_item('my_posts', 'Moji postovi', _use_li = True) }}
+```
+
+Kreirajmo novi predložak **my_posts.html**:
+```html
+{% raw %}{% extends "base.html" %}
+
+{% block title %}Moji postovi{% endblock %}
+{% block head %}
+{{ super() }}
+<style>
+</style>
+{% endblock %}
+
+{% block body %}
+
+<h2>Moji postovi</h2>
+
+{% if posts %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Naslov</th>
+            <th>Datum</th>
+            <th>Status</th>
+            <th>Tagovi</th>
+            <th>Akcije</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+        <tr>
+            <td><a href="{{ url_for('post_view', post_id=post['_id']) }}" class="text-dark text-decoration-none">{{ post.title }}</a></td>
+            <td>{{ post.date.strftime('%d.%m.%Y') }}</td>
+            <td>{{ post.status }}</td>
+            <td>{% for tag in post.tags.split(',') %}<span class="badge bg-primary">{{ tag }}</span>{% endfor %}</td>
+            <td>
+                <a href="{{ url_for('post_edit', post_id=post['_id']) }}" class="btn btn-primary btn-sm">Uredi</a>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal" data-postid="{{ post['_id'] }}">
+                    Briši
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Nemate postova.</p>
+{% endif %}
+
+{% endblock %}{% raw %}
+```
+
+Vidimo u popisu da status članka nije preveden, već može biti published ili draft, kako smo spremili u bazi
+Lokalizirajmo status pomoću novog filtera:
+```python
+def localize_status(status):
+    translations = {
+        "draft": "Skica",
+        "published": "Objavljen"
+    }
+    # Vrati prevedeni ili originalni ako nije pronađen
+    return translations.get(status, status)
+
+# Registirajmo filter za Jinja-u
+app.jinja_env.filters['localize_status'] = localize_status
+```
+
+Te doajmo filter za status u predložak:
+```html
+<td>{{ post.status | localize_status }}</td>
+```
+
+Vidimo i da brisanje ne radi. Razlog tome je što se *modal* za brisanjei pripadni JS kod nalazi u **blog_view.html** predlošku. Samo *deleteModal* sekciju ga prebacimo na dno **base.html** predloška i provjerimo da li brisanje sad radi.
