@@ -798,4 +798,126 @@ A ako nije prijavljen:
 ![Korisnik nije prijavljen](assets/images/not-logged.png)
 
 
+Sad kreirajmo stranicu za pregled i uređivanje profila.
+Dodajmo novu klasu za obrazac profila u **forms.py**:
+```python
+class ProfileForm(FlaskForm):
+    first_name = StringField("Ime", validators=[DataRequired(), Length(max=50)])
+    last_name = StringField("Prezime", validators=[DataRequired(), Length(max=50)])
+    bio = TextAreaField("Biografija", validators=[Length(max=1000)], render_kw={"id": "markdown-editor"})
+    submit = SubmitField("Spremi")
+```
+
+Kreirajmo i novu rutu za profilnu stranicu:
+```python
+from forms import ProfileForm
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = ProfileForm(obj=current_user)  # Pre-fill form with current user's data
+
+    if form.validate_on_submit():
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.bio = form.bio.data
+
+        db.users.update_one(
+        {"email": current_user.get_id()},
+        {"$set": {
+            "first_name": current_user.first_name,
+            "last_name": current_user.last_name,
+            "bio": current_user.bio
+        }}
+    )
+        
+        flash('Vaši podaci su uspješno spremljeni!', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('profile.html', form=form)
+```
+
+Te novi predložak **profile.html**:
+```html
+{% extends "base.html" %}
+
+{% block title %}Vaš profil{% endblock %}
+{% block head %}
+	{{ super() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+
+{% block body %}
+{% from 'bootstrap5/form.html' import render_form %}
+<h2>Ažurirajte svoj profil</h2>
+<div class="row">
+    <div class="col-6">{{ render_form(form) }}</div>
+</div>
+{% endblock %}
+{% block scripts %}
+	{{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script>
+        var easyMDE = new EasyMDE({ element: document.getElementById('markdown-editor') });
+    </script>
+{% endblock %}
+```
+
+Dodajmo i link za profilnu rutu u **base.html**:
+```html
+<a class="dropdown-item icon-link" href="{{url_for('profile') }}"><i class="bi bi-person mb-2"></i>Profil</a>
+```
+
+Pokrenite aplikaciju, idite na profilnu stranicu i upišite svoje podatke. U MonguDB možete vidjeti da su podaci ažurirani.
+Nakon spremanja, forma je i dalje prazna što znači, da nismo predali podatke koje smo spremili pa promijenimo taj dio u ruti.
+```python
+    user_data = users_collection.find_one({"email": current_user.get_id()})
+    if request.method == 'GET':
+        form.first_name.data = user_data["first_name"]
+        form.last_name.data = user_data["last_name"]
+        form.bio.data = user_data["bio"]
+    elif form.validate_on_submit():
+```
+
+Dodajmo i profilnu sliku u profil. U klasu **ProfileForm** obrasca dodajmo:
+```python
+image = FileField('Vaša slika', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!')])
+```
+
+Nakon koda za spremanje podataka u bazi u ruti profila spremimo sliku:
+```python
+        if form.image.data:
+            # Pobrišimo postojeću ako postoji
+            if hasattr(user_data, 'image_id') and user_data.image_id:
+                fs.delete(current_user.profile_photo_id)
+            
+            image_id = save_image_to_gridfs(request, fs)
+            if image_id != None:
+                users_collection.update_one(
+                {"email": current_user.get_id()},
+                {"$set": {
+                    'image_id': image_id,
+                }}
+            )
+```
+Pokrenimo aplikaciju i prenesimo svoju sliku na stranici profila. U bazi ćmo vidjeti da je slika spremljena
+
+Sad prikažimo sliku u formi. image_id prosljeđujemo kao dodtni parametar predlošku: 
+```python
+return render_template('profile.html', form=form, image_id=user_data["image_id"])
+```
+
+A u predložak dodajmo prikaz slike s desne strane obrasca:
+```html
+<div class="row">
+    <div class="col-6">{{ render_form(form) }}</div>
+    <div class="col-6">
+        {% if image_id %}
+        <img src="{{ url_for('serve_image', image_id=image_id) }}" class="img-thumbnail" style="max-width: 150px;" alt="User photo">
+        {% endif %}
+    </div>
+</div>
+```
+
+
 
