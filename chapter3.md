@@ -144,7 +144,7 @@ Pokrenimo aplikaciju, kliknimo na novi link i potvrdimo da je obrazac za prijavu
 * Lako se integrira s drugim ekstenzijama poput *flask-principal* za autorizaciju
 
 Ono što moramo sami napraviti je:
-* Pobrinuti se gdje ćemo spremati podatke (npr. u bazu )
+* Pobrinuti se gdje ćemo spremati podatke (npr. u bazu)
 * Odlučiti koju metodu autentikacije ćemo koristiti (korisnik/zaporka, OpenID, i sl.)
 * Brinuti o načinu registracije, aktivacije, obnovi zaporke i sl.
 
@@ -216,7 +216,7 @@ class UserNotFoundError(Exception):
 * Klasa **UserNotFoundError** je prilagođena iznimka koja se koristi za označavanje da korisnik nije pronađen u rječniku USERS.
 
 
-U login ruti implamentirajmo autentikaciju:
+U login ruti implementirajmo autentikaciju:
 ```python
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -235,7 +235,7 @@ def login():
 ```
 
 * Korisnik će biti uspješno prijavljen ako je upisao email adresu i zaportku iz riječnika USERS. Prikazuje se poruka o uspjehu i korisnik se preusmjerava na željenu ili početnu stranicu.
-* Ako je korisničko ime ili zaporka neispravno, prikazuje se poruka upozorenja.
+* Ako je korisničko ime ili zaporka neispravna, prikazuje se poruka upozorenja.
 * Sigurnosna provjera **next** sigurava da korisnik ne bude preusmjeren na zlonamjerni URL.
   * Ako korisnik pokušava pristupiti zaštićenoj stranici prije prijave, parametar next će sadržavati URL te stranice.
   * Ako next nije valjan (npr. ne počinje s /), korisnik će biti preusmjeren na početnu stranicu aplikacije (index).
@@ -270,11 +270,11 @@ def post_create():
 Kad je korisnik prijavljen, moramo dodati mogućnost i da se odjavi. Pa prominenimo u baznom predlošku dio s linkom za prijavu i dodajmo rutu **logout** za odjavu.
 
 ```html
-{% if current_user.is_authenticated %}
+{% raw %}{% if current_user.is_authenticated %}
     {{ render_nav_item('logout', 'Odjava', _use_li = True) }}
 {% else %}
     {{ render_nav_item('login', 'Prijava', _use_li = True) }}
-{% endif %}
+{% endif %}{% raw %}
 ```
 
 Ruta za odjavu:
