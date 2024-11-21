@@ -274,7 +274,7 @@ Kad je korisnik prijavljen, moramo dodati mogućnost i da se odjavi. Pa prominen
     {{ render_nav_item('logout', 'Odjava', _use_li = True) }}
 {% else %}
     {{ render_nav_item('login', 'Prijava', _use_li = True) }}
-{% endif %}{% raw %}
+{% endif %}{% endraw %}
 ```
 
 Ruta za odjavu:
@@ -395,7 +395,7 @@ Objašnjenje:
 
 Dodajmo novi  **register.html** predložak:
 ```html
-{% extends "base.html" %}
+{% raw %}{% extends "base.html" %}
 {% from 'bootstrap5/form.html' import render_form %}
 
 {% block title %}Registracija{% endblock %}
@@ -409,7 +409,7 @@ Dodajmo novi  **register.html** predložak:
         {{ render_form(form) }}
     </div>
 </div>
-{% endblock %}
+{% endblock %}{% endraw %}
 ```
 
 Dodajmo u **base.html** i odmah ispod linka za prijavu:
