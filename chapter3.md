@@ -247,13 +247,13 @@ Dodajmo u ```index.html``` prikaz informacija o prijavljenom korisniku koje se n
 * **get_id()**: Dohvaća jedinstveni ID korisnika, potreban Flask-Loginu za identifikaciju korisnika unutar sesije.
 
 ```html
-<div class="mt-4">
+{% raw %}<div class="mt-4">
     <h4>current_user:</h4>
     <p>is_authenticated: <b>{{current_user.is_authenticated}}</b></p>
     <p>is_active: <b>{{current_user.is_active}}</b></p>
     <p>is_anonymous: <b>{{current_user.is_anonymous}}</b></p>
     <p>get_id(): <b>{{current_user.get_id()}}</b></p>
-</div>
+</div>{% endraw %}
 ```
 
 Također na na sve tri blog *CUD* rute dodajmo **@login_required** dekorator.
