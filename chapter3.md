@@ -1024,7 +1024,7 @@ Kreirajmo novi predložak **my_posts.html**:
 <p>Nemate postova.</p>
 {% endif %}
 
-{% endblock %}{% raw %}
+{% endblock %}{% endraw %}
 ```
 
 Vidimo u popisu da status članka nije preveden, već može biti published ili draft, kako smo spremili u bazi
