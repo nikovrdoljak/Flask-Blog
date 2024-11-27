@@ -253,7 +253,12 @@ class UserForm(FlaskForm):
     submit = SubmitField("Spremi")
 ```
 
-Izmijenimo **profile.html** predložak tako da za naslov stavimo ```{{ title }}```.
+Izmijenimo **profile.html** predložak tako da za naslov stavimo ```{% raw %}{{ title }}{% endraw %}```.
+
+U users predlošku dodajmo link za Uredi gumb:
+```html
+{% raw %}<a href="{{ url_for('user_edit', user_id=user['_id']) }}" class="btn btn-primary btn-sm">Uredi</a>{% endraw %}
+```
 
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Autentikacija](chapter3.md)| 
