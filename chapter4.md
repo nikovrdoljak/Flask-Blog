@@ -1,3 +1,7 @@
+<link rel="stylesheet" href="assets/css/custom.css">
+
+[Naslovna stranica](README.md) | [Prethodno poglavlje: Autentikacija](chapter3.md)| 
+
 # Autorizacija
 
 **Autorizacija** je proces provjere ima li korisnik prava pristupa određenim resursima ili funkcionalnostima unutar aplikacije. Dok je **autentikacija** usmjerena na provjeru identiteta korisnika (npr. prijava pomoću korisničkog imena i zaporke), autorizacija se bavi time što korisnik smije raditi nakon što se prijavio.
@@ -11,7 +15,7 @@ Glavne značajke:
 * Uloge (roles): Koriste se za definiranje uloga, npr. admin, author, user.
 * Pravila (permissions): Određuju koje uloge imaju pristup određenim resursima.
 
-U našem primjeru, jednom korisniku ćemo dodijeli **admin** prava, te će taj korisnik imati mogućnost uređivanja podataka ostalih korisnika, koji će imati isključivo **editor** prava, te kako takvi će moći uređivati isključivo svoje članke. Takav korisnik će u bazi podataka imati svojstvo **is_admin = True**.
+U našem primjeru, jednom korisniku ćemo dodijeli **admin** prava, te će taj korisnik imati mogućnost uređivanja podataka ostalih korisnika (koji će imati isključivo **editor** prava). Ostali korisnici će moći uređivati isključivo svoje članke. Takav korisnik će u bazi podataka imati svojstvo **is_admin: true**.
 
 Najprije instalirajmo flask-principal:
 
@@ -60,17 +64,9 @@ Dodajmo još i sljedeću funkciju:
 @identity_loaded.connect_via(app)
 def on_identity_loaded(sender, identity):
     if current_user.is_authenticated:
-        # Set the identity user
         identity.user = current_user
-
-        # Add UserNeed to identity
         identity.provides.add(UserNeed(current_user.id))
-
-        # Add RoleNeed based on the user's role
-
         identity.provides.add(RoleNeed('author'))
-
-        # if hasattr(current_user, 'is_admin'):
         if current_user.is_admin:
             identity.provides.add(RoleNeed('admin'))
 ```
@@ -104,7 +100,9 @@ db.users.updateOne(
 )
 ```
 
-Sad možemo napravitu novu rutu za upravljanje korisnicima, te ju zaštiti tako da joj samo "admin" može pristupiti.
+Nakon obavljenog testiranja možemo pobrisati izmjene koje smo dodali u profile rutu i predložak.
+
+Sad ćemo napraviti novu rutu za upravljanje korisnicima, te ju zaštiti tako da joj samo "admin" može pristupiti.
 
 ```python
 @app.route('/users', methods=['GET', 'POST'])
@@ -162,3 +160,4 @@ Sad možemo i sakriti link na tu stranicu u navigacijskom izborniku ako korisnik
     {% endif %}{% endraw %}
 ```
 
+[Naslovna stranica](README.md) | [Prethodno poglavlje: Autentikacija](chapter3.md)| 

@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="assets/css/custom.css">
 
-[Naslovna stranica](README.md) | [Prethodno poglavlje: Uvod u baze podataka](chapter2.md)| 
+[Naslovna stranica](README.md) | [Prethodno poglavlje: Uvod u baze podataka](chapter2.md) | [Slijedeće poglavlje: Autorizacija](chapter4.md)
 
 
 # Autentikacija
@@ -1049,3 +1049,5 @@ Te doajmo filter za status u predložak:
 ```
 
 Vidimo i da brisanje ne radi. Razlog tome je što se *modal* za brisanjei pripadni JS kod nalazi u **blog_view.html** predlošku. Samo *deleteModal* sekciju ga prebacimo na dno **base.html** predloška i provjerimo da li brisanje sad radi.
+
+[Naslovna stranica](README.md) | [Prethodno poglavlje: Uvod u baze podataka](chapter2.md) | [Slijedeće poglavlje: Autorizacija](chapter4.md)
