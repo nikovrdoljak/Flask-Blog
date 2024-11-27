@@ -819,18 +819,14 @@ def profile():
     form = ProfileForm(obj=current_user)  # Pre-fill form with current user's data
 
     if form.validate_on_submit():
-        current_user.first_name = form.first_name.data
-        current_user.last_name = form.last_name.data
-        current_user.bio = form.bio.data
-
         db.users.update_one(
-        {"email": current_user.get_id()},
+        {"_id": user_data['_id']},
         {"$set": {
-            "first_name": current_user.first_name,
-            "last_name": current_user.last_name,
-            "bio": current_user.bio
+            "first_name": form.first_name.data,
+            "last_name": form.last_name.data,
+            "bio": form.bio.data
         }}
-    )
+        )
         
         flash('Vaši podaci su uspješno spremljeni!', 'success')
         return redirect(url_for('profile'))
@@ -890,12 +886,12 @@ Nakon koda za spremanje podataka u bazi u ruti profila spremimo sliku:
         if form.image.data:
             # Pobrišimo postojeću ako postoji
             if hasattr(user_data, 'image_id') and user_data.image_id:
-                fs.delete(current_user.profile_photo_id)
+                fs.delete(user_data.image_id)
             
             image_id = save_image_to_gridfs(request, fs)
             if image_id != None:
                 users_collection.update_one(
-                {"email": current_user.get_id()},
+                {"_id": user_data['_id']},
                 {"$set": {
                     'image_id': image_id,
                 }}
@@ -905,7 +901,7 @@ Pokrenimo aplikaciju i prenesimo svoju sliku na stranici profila. U bazi ćmo vi
 
 Sad prikažimo sliku u formi. image_id prosljeđujemo kao dodtni parametar predlošku: 
 ```python
-return render_template('profile.html', form=form, image_id=user_data["image_id"])
+return render_template('profile.html', form=form, image_id=user_data.get("image_id"))
 ```
 
 A u predložak dodajmo prikaz slike s desne strane obrasca:

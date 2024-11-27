@@ -109,7 +109,8 @@ Sad ćemo napraviti novu rutu za upravljanje korisnicima, te ju zaštiti tako da
 @login_required
 @admin_permission.require(http_exception=403)
 def users():
-    return "Popis korisnika"
+    users = users_collection.find().sort("email")
+    return render_template('users.html', users = users)
 ```
 
 Dekorator ```@admin_permission.require(http_exception=403)``` znači da samo korisnik koji je u **admin** ulozi, smije pristupiti traženoj ruti. 
@@ -128,7 +129,34 @@ Te novi predložak **users.html**:
 
 {% block body %}
 <h2>Korisnici</h2>
-{% endblock %}{% endraw %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Ime</th>
+            <th>Prezime</th>
+            <th>Potvrđen</th>
+            <th>Admin</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td><a href="#" class="text-dark text-decoration-none">{{ user.email }}</a></td>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td>{{ 'Da' if user.is_confirmed else 'Ne' }}</td>
+            <td>{{ 'Da' if user.is_admin else 'Ne' }}</td>
+            <td>
+                <a href="#" class="btn btn-primary btn-sm">Uredi</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+{% endraw %}
 ```
 
 Dodajmo rutu i predložak za grešku **403**:
@@ -160,4 +188,73 @@ Sad možemo i sakriti link na tu stranicu u navigacijskom izborniku ako korisnik
     {% endif %}{% endraw %}
 ```
 
+Sljedeći korak će biti stranica za ažuriranje podataka korisnika. Pošto već imamo stranicu profile za ažuriranje profila prijavljenog korisnika, iskoristit ćemo postojeću logiku tako da postojeća i nova ruta dijele zajednički kod, koji ćemo dodati u novu funkciju. Pa promijenimo profile rutu i dodajmo:
+
+```python
+def update_user_data(user_data, form):
+    if form.validate_on_submit():
+        db.users.update_one(
+        {"_id": user_data['_id']},
+        {"$set": {
+            "first_name": form.first_name.data,
+            "last_name": form.last_name.data,
+            "bio": form.bio.data
+        }}
+        )
+        if form.image.data:
+            # Pobrišimo postojeću ako postoji
+            if hasattr(user_data, 'image_id') and user_data.image_id:
+                fs.delete(user_data.image_id)
+            
+            image_id = save_image_to_gridfs(request, fs)
+            if image_id != None:
+                users_collection.update_one(
+                {"_id": user_data['_id']},
+                {"$set": {
+                    'image_id': image_id,
+                }}
+            )
+        flash("Podaci uspješno ažurirani!", "success")
+        return True
+    return False
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    user_data = users_collection.find_one({"email": current_user.get_id()})
+    form = ProfileForm(data=user_data)
+    title = "Vaš profil"
+    if update_user_data(user_data, form):
+        return redirect(url_for('profile'))
+    return render_template('profile.html', form=form, image_id=user_data.get("image_id"), title=title)
+
+@app.route('/user/<user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require(http_exception=403)
+def user_edit(user_id):
+    user_data = users_collection.find_one({"_id": ObjectId(user_id)})
+    form = UserForm(data=user_data)
+    title = "Korisnički profil"
+    if update_user_data(user_data, form):
+        return redirect(url_for('users'))
+    return render_template('profile.html', form=form, image_id=user_data.get("image_id"), title=title)
+
+```
+
+Dodajmo i novu formu:
+```python
+class UserForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Length(3, 64), Email()])
+    first_name = StringField("Ime", validators=[DataRequired(), Length(max=50)])
+    last_name = StringField("Prezime", validators=[DataRequired(), Length(max=50)])
+    is_confirmed = BooleanField('Potvrđen')
+    bio = TextAreaField("Biografija", validators=[Length(max=1000)], render_kw={"id": "markdown-editor"})
+    image = FileField('Slika', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Samo slike!')])
+    submit = SubmitField("Spremi")
+```
+
+Izmijenimo **profile.html** predložak tako da za naslov stavimo ```{{ title }}```.
+
+
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Autentikacija](chapter3.md)| 
+
