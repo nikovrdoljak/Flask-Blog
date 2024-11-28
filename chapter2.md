@@ -759,3 +759,4 @@ U sljedećem poglavlju upoznat ćemo se s autentikacijom u Flasku.
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md) | [Slijedeće poglavlje: Autentikacija](chapter3.md)
 
+

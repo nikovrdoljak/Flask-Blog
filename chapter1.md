@@ -600,3 +600,5 @@ Ove kategorije omogućavaju korisniku lako razlikovanje vrsta obavijesti zahvalj
 | `info`     | `alert-info`      | Plavo  |
 
 [Naslovna stranica](README.md) | [Slijedeće poglavlje: Rad s bazom podataka](chapter2.md)
+
+

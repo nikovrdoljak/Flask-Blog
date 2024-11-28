@@ -1128,3 +1128,4 @@ Na kraju izmijenimo bazni predložak da koristi temu korisnika:
 
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Uvod u baze podataka](chapter2.md) | [Slijedeće poglavlje: Autorizacija](chapter4.md)
+
