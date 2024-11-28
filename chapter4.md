@@ -45,7 +45,7 @@ Promijenimo i sljedeći dio, tako da prilikom dohvata podataka korisnika znamo d
 def load_user(email):
     user_data = users_collection.find_one({"email": email})
     if user_data:
-        return User(user_data['email'], user_data.get('is_admin'))
+        return User(user_data['email'], user_data.get('is_admin'), user_data.get('theme'))
     return None
 
 
@@ -53,6 +53,7 @@ class User(UserMixin):
     def __init__(self, email, admin=False):
         self.id = email
         self.admin = admin is True
+        self.theme = theme
 
     @property
     def is_admin(self):
