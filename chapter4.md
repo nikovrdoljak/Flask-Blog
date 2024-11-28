@@ -198,7 +198,8 @@ def update_user_data(user_data, form):
         {"$set": {
             "first_name": form.first_name.data,
             "last_name": form.last_name.data,
-            "bio": form.bio.data
+            "bio": form.bio.data,
+            "theme": form.bio.theme
         }}
         )
         if form.image.data:
