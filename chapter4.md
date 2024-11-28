@@ -103,6 +103,8 @@ db.users.updateOne(
 
 Nakon obavljenog testiranja možemo pobrisati izmjene koje smo dodali u profile rutu i predložak.
 
+## Upravljanje korisnicima
+
 Sad ćemo napraviti novu rutu za upravljanje korisnicima, te ju zaštiti tako da joj samo "admin" može pristupiti.
 
 ```python
