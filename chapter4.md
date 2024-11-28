@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="assets/css/custom.css">
 
-[Naslovna stranica](README.md) | [Prethodno poglavlje: Autentikacija](chapter3.md)| 
+[Naslovna stranica](README.md) | [Prethodno poglavlje: Autentikacija](chapter3.md) | [Slijedeće poglavlje: Objava aplikacije](chapter5.md)
 
 # Autorizacija
 
@@ -321,5 +321,4 @@ U **blog_view.html** predložak sakrijmo gumbe za izmjenu i brisanje članka ako
 ```
 
 
-[Naslovna stranica](README.md) | [Prethodno poglavlje: Autentikacija](chapter3.md)| 
-
+[Naslovna stranica](README.md) | [Prethodno poglavlje: Autentikacija](chapter3.md) | [Slijedeće poglavlje: Objava aplikacije](chapter5.md)
