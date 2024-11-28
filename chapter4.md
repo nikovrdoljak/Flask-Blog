@@ -86,8 +86,8 @@ Te proslijedimo ta dva parametra predlošku:
 
 U **profile.html** predložak dodajmo:
 ```html
-<p>is_admin: {{is_admin}}</p>
-<p>is_author: {{is_author}}</p>
+{% raw %}<p>is_admin: {{is_admin}}</p>
+<p>is_author: {{is_author}}</p>{% endraw %}
 ```
 
 Ako se sad prijavimo i odemo u stranicu profila, vidjet ćemo da je korisnik u ulozi "author", ali ne i u ulozi "admin".
