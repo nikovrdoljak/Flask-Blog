@@ -754,6 +754,86 @@ Detaljnije o korištenju Choices.js možete pronači na [https://github.com/Choi
 
 Ovime smo završili poglavlje o spremanju, uređivanju i dohvatu podataka (članaka) iz MongoDB baze podataka.
 
+## Bootwatch
+Ako želimo da tema naše aplikacije ne bude standardna Bootstrap tema možemo koristiti i neku od predefiniranih Bootswatch tema uz minimalne izmjene. Bootswatch nudi unaprijed definirane teme za Bootstrap:
+
+[https://bootswatch.com/](https://bootswatch.com/)
+
+Dovoljno je u **base.html** dodati:
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/minty/bootstrap.min.css">
+```
+gdje "minty" možemo zamijeniti nekom drugom temom.
+
+Sad želimo omogućiti korisniku da sam odabere temu u svojoj profilnoj stranici. U klasu **ProfileForm** dodajmo polje **theme** prije **image**:
+```python
+    theme = SelectField('Tema', choices=[
+        ('', ''),
+        ('cerulean', 'Cerulean'),
+        ('cosmo', 'Cosmo'),
+        ('cyborg', 'Cyborg'),
+        ('darkly', 'Darkly'),
+        ('flatly', 'Flatly'),
+        ('journal', 'Journal'),
+        ('litera', 'Litera'),
+        ('lumen', 'Lumen'),
+        ('lux', 'Lux'),
+        ('materia', 'Materia'),
+        ('minty', 'Minty'),
+        ('morph', 'Morph'),
+        ('pulse', 'Pulse'),
+        ('quartz', 'Quartz'),
+        ('sandstone', 'Sandstone'),
+        ('simplex', 'Simplex'),
+        ('sketchy', 'Sketchy'),
+        ('slate', 'Slate'),
+        ('solar', 'Solar'),
+        ('spacelab', 'Spacelab'),
+        ('superhero', 'Superhero'),
+        ('united', 'United'),
+        ('vapor', 'Vapor'),
+        ('yeti', 'Yeti'),
+        ('zephyr', 'Zephyr')
+    ])
+```
+
+U dijelu za spremanje podataka korisnika dodajmo theme:
+```python
+    if form.validate_on_submit():
+        db.users.update_one(
+        {"_id": user_data['_id']},
+        {"$set": {
+            "first_name": form.first_name.data,
+            "last_name": form.last_name.data,
+            "bio": form.bio.data,
+            "theme": form.theme.data
+        }}
+```
+
+Login dio izmijenimo, tako da u baznom predlošku možemo doći do podatak o temi korisnika:
+```python
+@login_manager.user_loader
+def load_user(email):
+    user_data = users_collection.find_one({"email": email})
+    if user_data:
+        return User(user_data['email'], user_data.get('is_admin'), user_data.get('theme'))
+    return None
+
+class User(UserMixin):
+    def __init__(self, email, admin=False, theme=''):
+        self.id = email
+        self.admin = admin is True
+        self.theme = theme
+```
+
+Na kraju izmijenimo bazni predložak da koristi temu korisnika:
+```html
+    {% raw %}{% if current_user.theme %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/{{current_user.theme}}/bootstrap.min.css">
+    {% endif %}{% endraw %}
+```
+
+
 U sljedećem poglavlju upoznat ćemo se s autentikacijom u Flasku.
 
 [Naslovna stranica](README.md) | [Prethodno poglavlje: Flask i web obrasci](chapter1.md) | [Slijedeće poglavlje: Autentikacija](chapter3.md)
