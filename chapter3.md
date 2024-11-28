@@ -1047,8 +1047,8 @@ Te doajmo filter za status u predložak:
 Vidimo i da brisanje ne radi. Razlog tome je što se *modal* za brisanjei pripadni JS kod nalazi u **blog_view.html** predlošku. Samo *deleteModal* sekciju ga prebacimo na dno **base.html** predloška i provjerimo da li brisanje sad radi.
 
 
-## Bootwatch
-Ako želimo da tema naše aplikacije ne bude standardna Bootstrap tema možemo koristiti i neku od predefiniranih Bootswatch tema uz minimalne izmjene. Bootswatch nudi unaprijed definirane teme za Bootstrap:
+## Bootswatch
+Ako želimo da tema naše aplikacije ne bude standardna Bootstrap tema možemo koristiti i neku od predefiniranih **Bootswatch** tema uz minimalne izmjene. Bootswatch nudi unaprijed definirane teme za Bootstrap:
 
 [https://bootswatch.com/](https://bootswatch.com/)
 

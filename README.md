@@ -63,7 +63,7 @@ Dobrodošli u Flask Blog vodič
   - [Korisnički profil](chapter3.md#korisnički-profil)
     - [Spremanje korisnika kao autora članka](chapter3.md#spremanje-korisnika-kao-autora-članka)
   - [Moji članci](chapter3.md#moji-članci)
-  - [Bootwatch](chapter3.md#bootwatch)
+  - [Bootswatch](chapter3.md#bootswatch)
 - [Poglevlje 4: Autorizacija](chapter4.md#autorizacija)
   - [Flask-Principal](chapter4.md#flask-principal)
   - [Uređivanje vlastitih članaka](chapter4.md#uređivanje-vlastitih-članaka)
