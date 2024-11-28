@@ -202,7 +202,7 @@ def update_user_data(user_data, form):
             "first_name": form.first_name.data,
             "last_name": form.last_name.data,
             "bio": form.bio.data,
-            "theme": form.bio.theme
+            "theme": form.theme.data
         }}
         )
         if form.image.data:
