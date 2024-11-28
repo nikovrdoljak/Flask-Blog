@@ -163,7 +163,7 @@ Dodajmo rutu i predložak za grešku **403**:
 ```python
 @app.errorhandler(403)
 def access_denied(e):
-    return render_template('403.html'), 403
+    return render_template('403.html', description=e.description), 403
 ```
 
 403.html:
@@ -173,7 +173,7 @@ def access_denied(e):
 
 {% block body %}
 <h2>Zabranjen pristup</h2>
-<p>Nemate ovlasti za pristup ovoj stranici.</p>
+<p>{{description}}</p>
 {% endblock %}{% endraw %}
 ```
 
@@ -258,6 +258,65 @@ Izmijenimo **profile.html** predložak tako da za naslov stavimo ```{% raw %}{{ 
 U users predlošku dodajmo link za Uredi gumb:
 ```html
 {% raw %}<a href="{{ url_for('user_edit', user_id=user['_id']) }}" class="btn btn-primary btn-sm">Uredi</a>{% endraw %}
+```
+
+## Uređivanje vlastitih članaka
+Trenutno bilo koji prijavljeni korisnik može uređivati ili izbrisati svaki članak, što ne želimo. Želimo da samo korisnik koji je kreirao članak može uređivati vlastite članke.
+Flask-Principal omogućuje stvaranje prilagođenih potreba (*Needs*). U ovom slučaju definirat ćemo *potrebu* za *vlasništvom* nad člankom:
+
+```python
+# Klasa za definiranje potrebe za uređivanjem članka
+class EditPostNeed(Need):
+    def __init__(self, post_id):
+        super().__init__('edit_post', post_id)
+
+# Pomoćna metoda za provjeru prava uređivanja
+def edit_post_permission(post_id):
+    return Permission(EditPostNeed(str(ObjectId(post_id))))
+```
+
+U Flask-Principalu moramo povezati prijavljenog korisnika s njihovim potrebama (npr. mogućnošću uređivanja vlastitih postova). To se postiže dodavanjem tih potreba pri prijavi korisnika. U funkciju **on_identity_loaded** dodajmo:
+```python
+        # Dodajemo EditPostNeed za svaki članak koji je korisnik kreirao
+        user_posts = posts_collection.find({"author": current_user.get_id()})
+        for post in user_posts:
+            identity.provides.add(EditPostNeed(str(post["_id"])))
+```
+
+Sad imamo sve spremno da zaštitimo uređivanje čalanak od strane drugih korisnika. U rute **post_edit()** i **delete_post()** dodjmo provjeru prava:
+```python
+from flask import abort
+
+def post_edit(post_id):
+    #  Provjera dozvole
+    permission = edit_post_permission(post_id)
+    if not permission.can():
+        abort(403, "Nemate dozvolu za uređivanje ovog članka.")
+
+
+def delete_post(post_id):
+     # Provjera dozvole
+    permission = edit_post_permission(post_id)
+    if not permission.can():
+        abort(403, "Nemate dozvolu za brisanje ovog posta.")
+```
+
+U rutu **post_view()** dodajmo **edit_post_permission** metodu kao parametar predlošku:
+```python
+    return render_template('blog_view.html', post=post, edit_post_permission=edit_post_permission)
+```
+
+U **blog_view.html** predložak sakrijmo gumbe za izmjenu i brisanje članka ako korisnik nema prava:
+```html
+        {% raw %}{% if edit_post_permission(post['_id']).can() %}
+        <div>
+            <a href="{{ url_for('post_edit', post_id=post['_id']) }}" type="button" class="btn btn-primary btn-sm">Uredi</a>
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                data-postid="{{ post['_id'] }}">
+                Briši
+            </button>
+        </div>
+        {% endif %}{% endraw %}
 ```
 
 
