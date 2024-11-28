@@ -120,9 +120,9 @@ Dekorator ```@admin_permission.require(http_exception=403)``` znači da samo kor
 
 Dodajmo i link u navigacijski izbornik ispod profilnog linka:
 ```html
-    <li>
+    {% raw %}<li>
         <a class="dropdown-item icon-link" href="{{url_for('users') }}"><i class="bi bi-people mb-2"></i>Korisnici</a>
-    </li>
+    </li>{% endraw %}
 ```
 
 Te novi predložak **users.html**:
