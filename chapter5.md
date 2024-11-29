@@ -5,7 +5,7 @@
 # Objava aplikacije
 Naša aplikacija pomalo poprima ozbiljan izgled, stoga sad želimo da je objavimo na neki javni poslužitelj, kako bi i drugi mogli vidjeti kako izgleda i radi. U ovom poglavlju ćemo opisati postupak objeve (*deployment*) naše aplikacije na dva servisa koji su nam dostupni i bespalni:
 * [https://cloud.mongodb.com/](MongoDB Atlas) - na koji ćemo staviti našu bazu podataka
-* [https://www.render.com/]Render - na koji ćemo objaviti Flask aplikaciju
+* [https://www.render.com/](Render) - na koji ćemo objaviti Flask aplikaciju
 
 ## MongoDB Atlas
 

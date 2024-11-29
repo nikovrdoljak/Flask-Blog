@@ -271,8 +271,8 @@ Flask-Principal omogućuje stvaranje prilagođenih potreba (*Needs*). U ovom slu
 ```python
 # Klasa za definiranje potrebe za uređivanjem članka
 class EditPostNeed(Need):
-    def __init__(self, post_id):
-        super().__init__('edit_post', post_id)
+    def __new__(cls, post_id):
+        return super(EditPostNeed, cls).__new__(cls, 'edit_post', post_id)
 
 # Pomoćna metoda za provjeru prava uređivanja
 def edit_post_permission(post_id):
