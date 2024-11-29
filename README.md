@@ -66,6 +66,7 @@ Dobrodošli u Flask Blog vodič
   - [Bootswatch](chapter3.md#bootswatch)
 - [Poglevlje 4: Autorizacija](chapter4.md#autorizacija)
   - [Flask-Principal](chapter4.md#flask-principal)
+  - [Upravljanje korisnicima](chapter4.md#upravljanje-korisnicima)
   - [Uređivanje vlastitih članaka](chapter4.md#uređivanje-vlastitih-članaka)
 - [Poglavlje 5: Objava aplikacije](chapter5.md#objava-aplikacije)
   - [MongoDB Atlas](chapter5.md#mongodb-atlas)
